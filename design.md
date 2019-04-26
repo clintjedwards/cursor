@@ -40,9 +40,29 @@ Pipeline object {
     depends_on
 }
 
+PipelineRun object {
+
+}
+
 worker object {
     id
     hostname
     state
 
+    GetPipeline/{id}
+    RunPipeline
+    ChangeState
 }
+
+
+master object {
+    GetPipeline/{can take an ID}
+    ListPipelines
+    GetMinion/{can take an ID}
+    ListMinions
+}
+
+
+* Pipelines are made up of multiple jobs
+* Jobs can depend on one another
+* Jobs are snippets of code that do something and then return a status

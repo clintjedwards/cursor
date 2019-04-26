@@ -13,3 +13,6 @@ node_modules/
 dist/*
 -dist/.gitkeep
 main.js
+
+#protobuff
+*.pb.go
