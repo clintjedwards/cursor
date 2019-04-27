@@ -37,6 +37,7 @@ type Pipeline struct {
 	LastRunID     int
 	LastRunDate   int // Complete time of last run
 	LastRunAuthor string
+	GitRepo       GitRepo
 }
 
 // PipelineRun represents a single run of a single pipeline
@@ -51,7 +52,6 @@ type PipelineRun struct {
 
 // GitRepo represents a single git repository
 type GitRepo struct {
-	URL      string
-	Branch   string
-	Branches []string
+	URL    string
+	Branch string
 }

@@ -5,6 +5,17 @@ package api;
 message Void {}
 
 service CursorMaster {
-
+  rpc CreatePipeline(CreatePipelineRequest) returns (CreatePipelineResponse) {}
 }
 
+message CreatePipelineRequest {
+  string name = 1;
+  string description = 2;
+  string gitRepo = 3;
+  string gitBranch = 4;
+}
+message CreatePipelineResponse {
+  bool completed = 1;
+  string error = 2;
+  int32 id = 3;
+}
