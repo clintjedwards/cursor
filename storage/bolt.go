@@ -4,45 +4,42 @@ import (
 	"time"
 
 	"github.com/boltdb/bolt"
+	"github.com/clintjedwards/cursor/config"
 )
 
-func NewBoltDB(path string) (*bolt.DB, error) {
-	db, err := bolt.Open(path, 0600, &bolt.Options{Timeout: 1 * time.Second})
-	if err != nil {
-		return nil, err
-	}
-
-	return db, nil
+type boltDB struct {
+	filePath string
+	store    *bolt.DB
 }
 
-// package storage
+func (boltDB *boltDB) Init(config *config.Config) error {
 
-// import (
-// 	"github.com/go-pg/pg"
-// 	"github.com/go-pg/pg/orm"
-// )
+	db, err := bolt.Open(config.Database.Path, 0600, &bolt.Options{Timeout: 1 * time.Second})
+	if err != nil {
+		return err
+	}
 
-// //NewPostgresDB returns a new postgres database with proper connections
-// func NewPostgresDB(username, password, address, name string) *pg.DB {
-// 	db := pg.Connect(&pg.Options{
-// 		User:     username,
-// 		Password: password,
-// 		Addr:     address,
-// 		Database: name,
-// 	})
+	boltDB.store = db
 
-// 	return db
-// }
+	return nil
+}
 
-// //InitDB creates new postgres tables following the struct model passed to it
-// func InitDB(database *pg.DB, models []interface{}) error {
-// 	for _, model := range models {
-// 		err := database.CreateTable(model, &orm.CreateTableOptions{
-// 			IfNotExists: true,
-// 		})
-// 		if err != nil {
-// 			return err
-// 		}
-// 	}
-// 	return nil
-// }
+func (boltDB *boltDB) GetAll() map[string][]byte {
+	return nil
+}
+
+func (boltDB *boltDB) Get(key string) ([]byte, error) {
+	return nil, nil
+}
+
+func (boltDB *boltDB) Add(value []byte) error {
+	return nil
+}
+
+func (boltDB *boltDB) Update(key string, newValue []byte) error {
+	return nil
+}
+
+func (boltDB *boltDB) Delete(key string) error {
+	return nil
+}
