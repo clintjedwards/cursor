@@ -3,7 +3,6 @@ package master
 import (
 	"net"
 
-	"github.com/boltdb/bolt"
 	"github.com/clintjedwards/cursor/config"
 	"github.com/clintjedwards/cursor/storage"
 	"github.com/clintjedwards/cursor/utils"
@@ -11,8 +10,9 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
+// CursorMaster represents a cursor master server
 type CursorMaster struct {
-	storage *bolt.DB
+	storage storage.Engine
 	config  *config.Config
 }
 
@@ -24,7 +24,7 @@ func initCursorMaster() *CursorMaster {
 		utils.StructuredLog(utils.LogLevelFatal, "failed to get config", err)
 	}
 
-	storage, err := storage.NewBoltDB(config.Database.Path)
+	storage, err := storage.InitStorage(storage.StorageEngineBoltDB)
 	if err != nil {
 		utils.StructuredLog(utils.LogLevelFatal, "failed init storage", err)
 	}
