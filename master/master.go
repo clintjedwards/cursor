@@ -1,8 +1,10 @@
 package master
 
 import (
+	"context"
 	"net"
 
+	"github.com/clintjedwards/cursor/api"
 	"github.com/clintjedwards/cursor/config"
 	"github.com/clintjedwards/cursor/storage"
 	"github.com/clintjedwards/cursor/utils"
@@ -35,6 +37,15 @@ func initCursorMaster() *CursorMaster {
 	return &cursorMaster
 }
 
+// CreatePipeline registers a new pipeline
+func (master *CursorMaster) CreatePipeline(context context.Context, request *api.CreatePipelineRequest) (*api.CreatePipelineResponse, error) {
+
+	// attempt to compile github repo saving the resulting binary to a specific directory called plugins
+	// we should only try to compile a specified folder that we determine
+	// pipelines all have a unique name
+	return nil, nil
+}
+
 // StartServer initializes a GRPC server
 func StartServer() {
 	config, err := config.FromEnv()
@@ -50,8 +61,9 @@ func StartServer() {
 	grpcServer := grpc.NewServer()
 	reflection.Register(grpcServer)
 
-	//initCursorMasterobject
-	//RegisterRoutes
+	cursorMaster := initCursorMaster()
+
+	api.RegisterCursorMasterServer(grpcServer, cursorMaster)
 
 	utils.StructuredLog(utils.LogLevelInfo,
 		"started cursor master",
