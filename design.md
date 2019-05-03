@@ -66,3 +66,9 @@ master object {
 * Pipelines are made up of multiple jobs
 * Jobs can depend on one another
 * Jobs are snippets of code that do something and then return a status
+
+
+CreatePipeline ---
+	// attempt to compile github repo saving the resulting binary to a specific directory called plugins
+	// we should only try to compile a specified folder that we determine
+	// pipelines all have a unique name

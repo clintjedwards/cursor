@@ -20,7 +20,7 @@ type Engine interface {
 	Init(config *config.Config) error
 	GetAll() map[string][]byte
 	Get(key string) ([]byte, error)
-	Add(value []byte) error
+	Add(bucketName string, key, value []byte) error
 	Update(key string, newValue []byte) error
 	Delete(key string) error
 }

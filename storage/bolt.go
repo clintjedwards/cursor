@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/boltdb/bolt"
@@ -21,6 +22,30 @@ func (boltDB *boltDB) Init(config *config.Config) error {
 
 	boltDB.store = db
 
+	err = boltDB.createBuckets("pipelines")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (boltDB *boltDB) createBuckets(names ...string) error {
+
+	for _, name := range names {
+		err := boltDB.store.Update(func(tx *bolt.Tx) error {
+			_, err := tx.CreateBucketIfNotExists([]byte(name))
+			if err != nil {
+				return fmt.Errorf("could not create bucket: %s; %v", name, err)
+			}
+
+			return nil
+		})
+
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -32,7 +57,16 @@ func (boltDB *boltDB) Get(key string) ([]byte, error) {
 	return nil, nil
 }
 
-func (boltDB *boltDB) Add(value []byte) error {
+func (boltDB *boltDB) Add(bucketName string, key, value []byte) error {
+
+	err := boltDB.store.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(bucketName))
+		err := bucket.Put(key, value)
+		return err
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
