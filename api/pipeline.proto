@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package api;
+
+message Pipeline {
+  int32 id = 1;           // Unique ID for pipeline
+  string name = 2;        // Human readable pipeline name
+  string description = 3; // Short description of pipeline's purpose
+  int32 created = 4;      // Time created in epoch
+  int32 modified = 5;     // Time last modified in epoch
+  gitRepo gitRepo = 6;  // Git information used to download and compile pipeline
+  repeated Run run = 7; // A record of the last x number of runs attempted
+}
+
+message gitRepo {
+  string url = 1;    // Git URL used to download repository, must be https
+  string branch = 2; // Specific branch
+}
+
+message Run {
+  int32 id = 1;       // Unique Pipeline run ID
+  string author = 2;  // User ID of author who initiated run
+  string lastJob = 3; // Last job name to start
+  int32 start = 4;    // Start time of run in epoch
+  int32 end = 5;      // End time of run in epoch
+  enum Status {
+    UNKNOWN = 0;
+    READY = 1;
+    RUNNING = 2;
+    FAILED = 3;
+  }
+  Status status = 6;        // Status code of run
+  repeated string logs = 7; // Logs of run
+}
+
+message Job {
+  string name = 1;
+  string description = 2;
+  enum JobStatus {
+    UNKNOWN = 0;
+    FAILED = 1;
+    SUCCESS = 2;
+    RUNNING = 3;
+    WAITING = 4;
+  }
+  JobStatus jobStatus = 3;
+  repeated int32 dependsOn = 4;
+}

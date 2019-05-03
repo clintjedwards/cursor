@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package api;
+
+import "api/pipeline.proto";
+
+message Void {}
+
+service CursorMaster {
+  rpc GetPipeline(GetPipelineRequest) returns (GetPipelineResponse) {}
+  rpc ListPipelines(ListPipelinesRequest) returns (ListPipelinesResponse) {}
+  rpc CreatePipeline(CreatePipelineRequest) returns (CreatePipelineResponse) {}
+  rpc DeletePipeline(DeletePipelineRequest) returns (DeletePipelineResponse) {}
+  rpc RegisterWorker(RegisterWorkerRequest) returns (RegisterWorkerResponse) {}
+}
+
+message CreatePipelineRequest {
+  string name = 1;        // Human readable pipeline name
+  string description = 2; // Short description of what pipeline is used for
+  gitRepo gitRepo = 3; // Git information used to download and compile pipeline
+}
+
+message CreatePipelineResponse {
+  int32 id = 1; // Unique id for pipeline
+}
+
+message GetPipelineRequest {}
+message GetPipelineResponse {}
+
+message ListPipelinesRequest {}
+message ListPipelinesResponse {}
+
+message DeletePipelineRequest {}
+message DeletePipelineResponse {}
+
+message RegisterWorkerRequest {}
+message RegisterWorkerResponse {}
