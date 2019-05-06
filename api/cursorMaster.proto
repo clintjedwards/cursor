@@ -21,7 +21,7 @@ message CreatePipelineRequest {
 }
 
 message CreatePipelineResponse {
-  int32 id = 1; // Unique id for pipeline
+  string id = 1; // Unique id for pipeline
 }
 
 message GetPipelineRequest {}

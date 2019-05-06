@@ -3,11 +3,13 @@ package master
 import (
 	"context"
 	"net"
+	"time"
 
 	"github.com/clintjedwards/cursor/api"
 	"github.com/clintjedwards/cursor/config"
 	"github.com/clintjedwards/cursor/storage"
 	"github.com/clintjedwards/cursor/utils"
+	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -40,7 +42,44 @@ func initCursorMaster() *CursorMaster {
 // CreatePipeline registers a new pipeline
 func (master *CursorMaster) CreatePipeline(context context.Context, request *api.CreatePipelineRequest) (*api.CreatePipelineResponse, error) {
 
-	master.storage.Add("pipelines")
+	newPipeline := api.Pipeline{
+		Id:          string(utils.GenerateRandString(master.config.Master.IDLength)),
+		Name:        request.Name,
+		Description: request.Description,
+		Created:     time.Now().Unix(),
+		Modified:    time.Now().Unix(),
+		GitRepo: &api.GitRepo{
+			Url:    request.GitRepo.Url,
+			Branch: request.GitRepo.Branch,
+		},
+	}
+
+	protoNewPipeline, err := proto.Marshal(&newPipeline)
+	if err != nil {
+		return nil, err
+	}
+
+	err = master.storage.Add("pipelines", []byte(newPipeline.Id), protoNewPipeline)
+	if err != nil {
+		return nil, err
+	}
+
+	return &api.CreatePipelineResponse{Id: newPipeline.Id}, nil
+}
+
+func (master *CursorMaster) ListPipelines(context context.Context, request *api.ListPipelinesRequest) (*api.ListPipelinesResponse, error) {
+	return nil, nil
+}
+
+func (master *CursorMaster) GetPipeline(context context.Context, request *api.GetPipelineRequest) (*api.GetPipelineResponse, error) {
+	return nil, nil
+}
+
+func (master *CursorMaster) DeletePipeline(context context.Context, request *api.DeletePipelineRequest) (*api.DeletePipelineResponse, error) {
+	return nil, nil
+}
+
+func (master *CursorMaster) RegisterWorker(context context.Context, request *api.RegisterWorkerRequest) (*api.RegisterWorkerResponse, error) {
 	return nil, nil
 }
 
