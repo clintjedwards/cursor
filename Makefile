@@ -1,7 +1,6 @@
 SHELL = /bin/bash
 GIT_COMMIT := $(shell git rev-parse --short HEAD)
-VERSION_FILE=VERSION.md
-VERSION=$(shell cat ${VERSION_FILE})
+VERSION=0.1.0
 
 GO_LDFLAGS := '-X "github.com/clintjedwards/cursor/cmd.appVersion=$(VERSION) $(GIT_COMMIT)"'
 

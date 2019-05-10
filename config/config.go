@@ -9,15 +9,15 @@ type DatabaseConfig struct {
 
 // MasterConfig defines config settings for the cursor master
 type MasterConfig struct {
-	IDLength int `envconfig:"cursor_id_length" default:"5"` // the length of all randomly generated ids
+	URL      string `envconfig:"cursor_master_url" default:"localhost:8080"`
+	IDLength int    `envconfig:"cursor_id_length" default:"5"` // the length of all randomly generated ids
 }
 
 // Config represents overall configuration objects of the application
 type Config struct {
-	ServerURL string `envconfig:"cursor_server_url" default:"localhost:8080"`
-	Debug     bool   `envconfig:"cursor_debug" default:"false"`
-	Database  *DatabaseConfig
-	Master    *MasterConfig
+	Debug    bool `envconfig:"cursor_debug" default:"false"`
+	Database *DatabaseConfig
+	Master   *MasterConfig
 }
 
 // FromEnv parses environment variables into the config object based on envconfig name

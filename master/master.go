@@ -90,7 +90,7 @@ func StartServer() {
 		utils.StructuredLog(utils.LogLevelFatal, "failed to get config", err)
 	}
 
-	listen, err := net.Listen("tcp", config.ServerURL)
+	listen, err := net.Listen("tcp", config.Master.URL)
 	if err != nil {
 		utils.StructuredLog(utils.LogLevelFatal, "could not initialize tcp listener", err)
 	}
@@ -104,6 +104,6 @@ func StartServer() {
 
 	utils.StructuredLog(utils.LogLevelInfo,
 		"started cursor master",
-		map[string]string{"server_url": config.ServerURL})
+		map[string]string{"server_url": config.Master.URL})
 	grpcServer.Serve(listen)
 }
