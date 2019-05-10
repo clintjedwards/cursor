@@ -11,7 +11,9 @@ import (
 	"github.com/clintjedwards/cursor/utils"
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/grpc/status"
 )
 
 // CursorMaster represents a cursor master server
@@ -54,6 +56,14 @@ func (master *CursorMaster) CreatePipeline(context context.Context, request *api
 		},
 	}
 
+	if newPipeline.GitRepo.Url == "" {
+		return &api.CreatePipelineResponse{}, status.Error(codes.FailedPrecondition, "git url required")
+	}
+
+	if newPipeline.Name == "" {
+		return &api.CreatePipelineResponse{}, status.Error(codes.FailedPrecondition, "name required")
+	}
+
 	protoNewPipeline, err := proto.Marshal(&newPipeline)
 	if err != nil {
 		return nil, err
@@ -63,6 +73,8 @@ func (master *CursorMaster) CreatePipeline(context context.Context, request *api
 	if err != nil {
 		return nil, err
 	}
+
+	utils.StructuredLog(utils.LogLevelInfo, "pipeline created", newPipeline)
 
 	return &api.CreatePipelineResponse{Id: newPipeline.Id}, nil
 }
