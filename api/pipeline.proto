@@ -8,8 +8,8 @@ message Pipeline {
   string description = 3; // Short description of pipeline's purpose
   int64 created = 4;      // Time created in epoch
   int64 modified = 5;     // Time last modified in epoch
-  gitRepo gitRepo = 6;    // Git information used to download and compile pipeline
-  repeated Run run = 7;   // A record of the last x number of runs attempted
+  gitRepo gitRepo = 6;  // Git information used to download and compile pipeline
+  repeated Run run = 7; // A record of the last x number of runs attempted
 }
 
 message gitRepo {

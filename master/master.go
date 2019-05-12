@@ -64,6 +64,10 @@ func (master *CursorMaster) CreatePipeline(context context.Context, request *api
 		return &api.CreatePipelineResponse{}, status.Error(codes.FailedPrecondition, "name required")
 	}
 
+	if newPipeline.GitRepo.Branch == "" {
+		newPipeline.GitRepo.Branch = "master"
+	}
+
 	protoNewPipeline, err := proto.Marshal(&newPipeline)
 	if err != nil {
 		return nil, err
@@ -87,6 +91,7 @@ func (master *CursorMaster) GetPipeline(context context.Context, request *api.Ge
 	return nil, nil
 }
 
+// Remember to remove the plugins here also
 func (master *CursorMaster) DeletePipeline(context context.Context, request *api.DeletePipelineRequest) (*api.DeletePipelineResponse, error) {
 	return nil, nil
 }

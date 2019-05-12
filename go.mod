@@ -3,6 +3,7 @@ module github.com/clintjedwards/cursor
 require (
 	github.com/boltdb/bolt v1.3.1
 	github.com/golang/protobuf v1.3.1
+	github.com/google/go-github/v25 v25.0.2
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/kelseyhightower/envconfig v1.3.0
 	github.com/sirupsen/logrus v1.4.1
@@ -14,4 +15,5 @@ require (
 	google.golang.org/appengine v1.4.0 // indirect
 	google.golang.org/genproto v0.0.0-20190425155659-357c62f0e4bb // indirect
 	google.golang.org/grpc v1.20.1
+	gopkg.in/src-d/go-git.v4 v4.11.0
 )
