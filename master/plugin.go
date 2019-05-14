@@ -1,37 +1,31 @@
 package master
 
-import (
-	"github.com/clintjedwards/cursor/api"
-	"gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/plumbing"
-)
+// func prepareEnvironment() error {
 
-func prepareEnvironment() error {
+// 	return nil
+// }
 
-	return nil
-}
+// func cloneRepository(repo *api.GitRepo) error {
 
-func cloneRepository(repo *api.GitRepo) error {
+// 	_, err := git.PlainClone("/tmp/foo", false, &git.CloneOptions{
+// 		URL:           repo.Url,
+// 		ReferenceName: plumbing.NewBranchReferenceName(repo.Branch),
+// 	})
 
-	_, err := git.PlainClone("/tmp/foo", false, &git.CloneOptions{
-		URL:           repo.Url,
-		ReferenceName: plumbing.NewBranchReferenceName(repo.Branch),
-	})
+// cloneOptions := &github.CloneOptions{
+// 	Auth:              nil,
+// 	URL:               repo.Url,
+// 	RecurseSubmodules: github.DefaultSubmoduleRecursionDepth,
+// 	SingleBranch:      true,
+// }
 
-	// cloneOptions := &github.CloneOptions{
-	// 	Auth:              nil,
-	// 	URL:               repo.Url,
-	// 	RecurseSubmodules: github.DefaultSubmoduleRecursionDepth,
-	// 	SingleBranch:      true,
-	// }
+// 	return nil
+// }
 
-	return nil
-}
+// func buildRepo() error {
 
-func buildRepo() error {
-
-	return nil
-}
+// 	return nil
+// }
 
 // import (
 // 	"os"

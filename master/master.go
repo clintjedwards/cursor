@@ -73,7 +73,7 @@ func (master *CursorMaster) CreatePipeline(context context.Context, request *api
 		return nil, err
 	}
 
-	err = master.storage.Add("pipelines", []byte(newPipeline.Id), protoNewPipeline)
+	err = master.storage.Add("pipelines", newPipeline.Id, protoNewPipeline)
 	if err != nil {
 		return nil, err
 	}
@@ -83,19 +83,23 @@ func (master *CursorMaster) CreatePipeline(context context.Context, request *api
 	return &api.CreatePipelineResponse{Id: newPipeline.Id}, nil
 }
 
+// ListPipelines returns a list of all pipelines on a cursor master
 func (master *CursorMaster) ListPipelines(context context.Context, request *api.ListPipelinesRequest) (*api.ListPipelinesResponse, error) {
+
 	return nil, nil
 }
 
+// GetPipeline returns a single pipeline by id
 func (master *CursorMaster) GetPipeline(context context.Context, request *api.GetPipelineRequest) (*api.GetPipelineResponse, error) {
 	return nil, nil
 }
 
-// Remember to remove the plugins here also
+// TODO: Remember to remove the plugins here also
 func (master *CursorMaster) DeletePipeline(context context.Context, request *api.DeletePipelineRequest) (*api.DeletePipelineResponse, error) {
 	return nil, nil
 }
 
+// RegisterWorker connects a new worker with a given cursor master
 func (master *CursorMaster) RegisterWorker(context context.Context, request *api.RegisterWorkerRequest) (*api.RegisterWorkerResponse, error) {
 	return nil, nil
 }

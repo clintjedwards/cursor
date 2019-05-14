@@ -3,7 +3,6 @@ module github.com/clintjedwards/cursor
 require (
 	github.com/boltdb/bolt v1.3.1
 	github.com/golang/protobuf v1.3.1
-	github.com/google/go-github/v25 v25.0.2
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/kelseyhightower/envconfig v1.3.0
 	github.com/sirupsen/logrus v1.4.1

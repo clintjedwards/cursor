@@ -18,11 +18,11 @@ const (
 // Engine represents backend storage implementations where items can be persisted
 type Engine interface {
 	Init(config *config.Config) error
-	GetAll() map[string][]byte
-	Get(key string) ([]byte, error)
-	Add(bucketName string, key, value []byte) error
-	Update(key string, newValue []byte) error
-	Delete(key string) error
+	GetAll(bucketName string) (map[string][]byte, error)
+	Get(bucketName string, key string) ([]byte, error)
+	Add(bucketName, key string, value []byte) error
+	Update(bucketName, key string, newValue []byte) error
+	Delete(bucketName, key string) error
 }
 
 // InitStorage creates a storage object with the appropriate engine

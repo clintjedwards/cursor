@@ -28,7 +28,10 @@ message GetPipelineRequest {}
 message GetPipelineResponse {}
 
 message ListPipelinesRequest {}
-message ListPipelinesResponse {}
+message ListPipelinesResponse {
+  repeated Pipeline pipelines =
+      1; // list of pipelines (should this be a map)
+}
 
 message DeletePipelineRequest {}
 message DeletePipelineResponse {}

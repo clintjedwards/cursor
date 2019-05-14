@@ -49,19 +49,27 @@ func (boltDB *boltDB) createBuckets(names ...string) error {
 	return nil
 }
 
-func (boltDB *boltDB) GetAll() map[string][]byte {
-	return nil
-}
-
-func (boltDB *boltDB) Get(key string) ([]byte, error) {
+func (boltDB *boltDB) GetAll(bucketName string) (map[string][]byte, error) {
+	err := boltDB.store.View(func(tx *bolt.Tx) error {
+		_ = tx.Bucket([]byte(bucketName))
+		//bucket.ForEach()
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
 	return nil, nil
 }
 
-func (boltDB *boltDB) Add(bucketName string, key, value []byte) error {
+func (boltDB *boltDB) Get(bucketName string, key string) ([]byte, error) {
+	return nil, nil
+}
+
+func (boltDB *boltDB) Add(bucketName, key string, value []byte) error {
 
 	err := boltDB.store.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
-		err := bucket.Put(key, value)
+		err := bucket.Put([]byte(key), value)
 		return err
 	})
 	if err != nil {
@@ -70,10 +78,10 @@ func (boltDB *boltDB) Add(bucketName string, key, value []byte) error {
 	return nil
 }
 
-func (boltDB *boltDB) Update(key string, newValue []byte) error {
+func (boltDB *boltDB) Update(bucketName, key string, newValue []byte) error {
 	return nil
 }
 
-func (boltDB *boltDB) Delete(key string) error {
+func (boltDB *boltDB) Delete(bucketName, key string) error {
 	return nil
 }
