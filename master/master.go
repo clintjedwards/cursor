@@ -70,12 +70,12 @@ func (master *CursorMaster) CreatePipeline(context context.Context, request *api
 
 	protoNewPipeline, err := proto.Marshal(&newPipeline)
 	if err != nil {
-		return nil, err
+		return &api.CreatePipelineResponse{}, status.Error(codes.Internal, "failed to marshal proto")
 	}
 
-	err = master.storage.Add("pipelines", newPipeline.Id, protoNewPipeline)
+	err = master.storage.Add(storage.PipelinesBucket, newPipeline.Id, protoNewPipeline)
 	if err != nil {
-		return nil, err
+		return &api.CreatePipelineResponse{}, status.Error(codes.Internal, "could not save pipeline")
 	}
 
 	utils.StructuredLog(utils.LogLevelInfo, "pipeline created", newPipeline)
@@ -85,7 +85,25 @@ func (master *CursorMaster) CreatePipeline(context context.Context, request *api
 
 // ListPipelines returns a list of all pipelines on a cursor master
 func (master *CursorMaster) ListPipelines(context context.Context, request *api.ListPipelinesRequest) (*api.ListPipelinesResponse, error) {
-	return nil, nil
+
+	rawPipelines, err := master.storage.GetAll(storage.PipelinesBucket)
+	if err != nil {
+		return &api.ListPipelinesResponse{}, status.Error(codes.Internal, "failed to retrieve pipelines from database")
+	}
+
+	pipelines := map[string]*api.Pipeline{}
+
+	for key, value := range rawPipelines {
+		pipeline := &api.Pipeline{}
+		err := proto.Unmarshal(value, pipeline)
+		if err != nil {
+			utils.StructuredLog(utils.LogLevelError, "could not unmarshal pipeline", map[string]string{"pipeline_key": key, "err": err.Error()})
+			continue
+		}
+		pipelines[key] = pipeline
+	}
+
+	return &api.ListPipelinesResponse{Pipelines: pipelines}, nil
 }
 
 // GetPipeline returns a single pipeline by id

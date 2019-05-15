@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"strings"
 
@@ -38,8 +39,9 @@ func runPipelinesListCmd(cmd *cobra.Command, args []string) {
 		log.Fatalf("could not list pipelines: %v", err)
 	}
 
-	_ = pipelines
-	log.Fatalf("not implemented")
+	for key, value := range pipelines.Pipelines {
+		fmt.Printf("%s :: %s\n", key, value.String())
+	}
 }
 
 func init() {
