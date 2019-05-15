@@ -33,18 +33,15 @@ func runPipelinesListCmd(cmd *cobra.Command, args []string) {
 	}
 	defer cursorClient.Close()
 
-	_, err = cursorClient.ListPipelines(&api.ListPipelinesRequest{})
+	pipelines, err := cursorClient.ListPipelines(&api.ListPipelinesRequest{})
 	if err != nil {
 		log.Fatalf("could not list pipelines: %v", err)
 	}
+
+	_ = pipelines
+	log.Fatalf("not implemented")
 }
 
 func init() {
-	var description string
-	cmdPipelinesCreate.Flags().StringVarP(&description, "description", "d", "", "long form description of pipeline")
-
-	var gitBranch string
-	cmdPipelinesCreate.Flags().StringVarP(&gitBranch, "git_branch", "b", "master", "git branch name")
-
-	cmdPipeline.AddCommand(cmdPipelinesCreate)
+	cmdPipeline.AddCommand(cmdPipelinesList)
 }

@@ -13,6 +13,11 @@ type MasterConfig struct {
 	IDLength int    `envconfig:"cursor_id_length" default:"5"` // the length of all randomly generated ids
 }
 
+// MinionConfig defines config settings for the cursor minions
+type MinionConfig struct {
+	URL string `envconfig:"cursor_master_url" default:"localhost:8081"`
+}
+
 // Config represents overall configuration objects of the application
 type Config struct {
 	Debug    bool `envconfig:"cursor_debug" default:"false"`

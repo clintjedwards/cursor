@@ -14,5 +14,4 @@ require (
 	google.golang.org/appengine v1.4.0 // indirect
 	google.golang.org/genproto v0.0.0-20190425155659-357c62f0e4bb // indirect
 	google.golang.org/grpc v1.20.1
-	gopkg.in/src-d/go-git.v4 v4.11.0
 )

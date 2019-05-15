@@ -85,7 +85,6 @@ func (master *CursorMaster) CreatePipeline(context context.Context, request *api
 
 // ListPipelines returns a list of all pipelines on a cursor master
 func (master *CursorMaster) ListPipelines(context context.Context, request *api.ListPipelinesRequest) (*api.ListPipelinesResponse, error) {
-
 	return nil, nil
 }
 
