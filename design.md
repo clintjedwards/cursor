@@ -27,6 +27,13 @@ The con of this is that you have to build your own libraries for all the differe
 * Authenication and ACLs can build upon github groups and oauth
 * Auto recompilation of github repo
 
+
+## Questions
+How do users use the filesystem in a safe and scaleable way?
+    Minions can provide each job with its own folder for things that need to be downloaded. Cursor can monitor the size of that filesystem and report it back to the user along with the size of all of pipeline folders and the total size of the disk. User will be responsible for making sure they don't go over disk limits. This does mean that minions don't have a centralized file system that they can use and all the pros/cons that come with that.
+    (how do we present this folder to the user? Does plugins have an API for this?)
+
+
 -----
 
 Pipeline object {
