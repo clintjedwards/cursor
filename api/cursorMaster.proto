@@ -4,8 +4,6 @@ package api;
 
 import "api/pipeline.proto";
 
-message Void {}
-
 service CursorMaster {
   rpc GetPipeline(GetPipelineRequest) returns (GetPipelineResponse) {}
   rpc ListPipelines(ListPipelinesRequest) returns (ListPipelinesResponse) {}

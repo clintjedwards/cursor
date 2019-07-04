@@ -2,6 +2,7 @@ package master
 
 import (
 	"context"
+	"log"
 	"net"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 )
@@ -22,13 +24,9 @@ type CursorMaster struct {
 	config  *config.Config
 }
 
-func initCursorMaster() *CursorMaster {
+// NewCursorMaster inits a grpc cursor master server
+func NewCursorMaster(config *config.Config) *CursorMaster {
 	cursorMaster := CursorMaster{}
-
-	config, err := config.FromEnv()
-	if err != nil {
-		utils.StructuredLog(utils.LogLevelFatal, "failed to get config", err)
-	}
 
 	storage, err := storage.InitStorage(storage.StorageEngineBoltDB)
 	if err != nil {
@@ -39,6 +37,38 @@ func initCursorMaster() *CursorMaster {
 	cursorMaster.storage = storage
 
 	return &cursorMaster
+}
+
+// CreateGRPCServer creates a grpc server with all the proper settings; TLS enabled
+func CreateGRPCServer(cursorMaster *CursorMaster) *grpc.Server {
+
+	creds, err := credentials.NewServerTLSFromFile(cursorMaster.config.TLSCertPath, cursorMaster.config.TLSKeyPath)
+	if err != nil {
+		utils.StructuredLog(utils.LogLevelFatal, "failed to get certificates", err)
+	}
+
+	serverOption := grpc.Creds(creds)
+
+	grpcServer := grpc.NewServer(serverOption)
+
+	reflection.Register(grpcServer)
+	api.RegisterCursorMasterServer(grpcServer, cursorMaster)
+
+	return grpcServer
+}
+
+// InitGRPCService starts a GPRC server
+func InitGRPCService(config *config.Config, server *grpc.Server) {
+
+	listen, err := net.Listen("tcp", config.Master.GRPCURL)
+	if err != nil {
+		utils.StructuredLog(utils.LogLevelFatal, "could not initialize tcp listener", err)
+	}
+
+	utils.StructuredLog(utils.LogLevelInfo, "starting cursor master grpc service",
+		map[string]string{"url": config.Master.GRPCURL})
+
+	log.Fatal(server.Serve(listen))
 }
 
 // CreatePipeline registers a new pipeline

@@ -9,6 +9,7 @@ build:
 
 run:
 	go mod tidy
+	protoc --go_out=plugins=grpc:. api/*.proto
 	go build -ldflags $(GO_LDFLAGS) -o /tmp/cursor && /tmp/cursor master
 
 install:

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/boltdb/bolt"
+	"github.com/clintjedwards/cursor/api"
 	"github.com/clintjedwards/cursor/config"
 )
 
@@ -15,7 +16,7 @@ type boltDB struct {
 
 func (boltDB *boltDB) Init(config *config.Config) error {
 
-	db, err := bolt.Open(config.Database.Path, 0600, &bolt.Options{Timeout: 1 * time.Second})
+	db, err := bolt.Open(config.Database.BoltDB.Path, 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		return err
 	}
@@ -29,6 +30,16 @@ func (boltDB *boltDB) Init(config *config.Config) error {
 
 	return nil
 }
+
+func (boltDB *boltDB) GetAllPipelines(user string) (map[string]*api.Pipeline, error) {
+	return nil, nil
+}
+func (boltDB *boltDB) GetPipelines(user, id string) (*api.Pipeline, error) {
+	return nil, nil
+}
+func (boltDB *boltDB) AddPipelines(user, id string, pipeline *api.Pipeline) error    { return nil }
+func (boltDB *boltDB) UpdatePipelines(user, id string, pipeline *api.Pipeline) error { return nil }
+func (boltDB *boltDB) DeletePipelines(user, id string) error                         { return nil }
 
 func (boltDB *boltDB) createBuckets(names ...string) error {
 

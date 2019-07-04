@@ -14,5 +14,12 @@ dist/*
 -dist/.gitkeep
 main.js
 
-#protobuff
+#protobuf
 *.pb.go
+*_pb.d.ts
+*_pb.js
+*Pb.ts
+
+#localhost cert files
+*.crt
+*.key

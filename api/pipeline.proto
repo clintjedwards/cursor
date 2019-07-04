@@ -3,46 +3,59 @@ syntax = "proto3";
 package api;
 
 message Pipeline {
-  string id = 1;          // Unique ID for pipeline
-  string name = 2;        // Human readable pipeline name
-  string description = 3; // Short description of pipeline's purpose
-  int64 created = 4;      // Time created in epoch
-  int64 modified = 5;     // Time last modified in epoch
-  gitRepo gitRepo = 6;  // Git information used to download and compile pipeline
-  repeated Run run = 7; // A record of the last x number of runs attempted
+    string id = 1;          // Unique ID for pipeline
+    string name = 2;        // Human readable pipeline name
+    string description = 3; // Short description of pipeline's purpose
+    int64 created = 4;      // Time created in epoch
+    int64 modified = 5;     // Time last modified in epoch
+    GitRepo git_repo = 6;  // Git information used to download and compile pipeline
+    repeated PipelineRun runs = 7; // A record of the last x number of runs attempted
 }
 
-message gitRepo {
-  string url = 1;    // Git URL used to download repository, must be https
-  string branch = 2; // Specific branch
+message GitRepo {
+    string url = 1;    // Git URL used to download repository, must be https
+    string branch = 2; // Specific branch
 }
 
-message Run {
-  string id = 1;       // Unique Pipeline run ID
-  string author = 2;   // User ID of author who initiated run
-  string lastTask = 3; // Last task name to start
-  int64 start = 4;     // Start time of run in epoch
-  int64 end = 5;       // End time of run in epoch
-  enum Status {
-    UNKNOWN = 0;
-    READY = 1;
-    RUNNING = 2;
-    FAILED = 3;
-  }
-  Status status = 6;        // Status code of run
-  repeated string logs = 7; // Logs of run
+message PipelineRun {
+    string id = 1;       // Unique Pipeline run ID
+    int64 start = 2;     // Start time of run in epoch
+    int64 end = 3;       // End time of run in epoch
+    enum Status {
+        UNKNOWN = 0;
+        READY = 1;
+        RUNNING = 2;
+        FAILED = 3;
+    }
+    Status status = 4;        // Status code of run
+    repeated string logs = 5; // Logs of run
 }
 
 message Task {
-  string name = 1;
-  string description = 2;
-  enum TaskStatus {
-    UNKNOWN = 0;
-    FAILED = 1;
-    SUCCESS = 2;
-    RUNNING = 3;
-    WAITING = 4;
-  }
-  TaskStatus taskStatus = 3;
-  repeated string dependsOn = 4;
+    string name = 1;
+    string description = 2;
+    enum TaskStatus {
+        UNKNOWN = 0;
+        FAILED = 1;
+        SUCCESS = 2;
+        RUNNING = 3;
+        WAITING = 4;
+    }
+    TaskStatus task_status = 3;
+    repeated string depends_on = 4;
+}
+
+message TaskRun {
+    string id = 1;
+    string pipeline_run_id = 2;
+    int64 start = 3;     // Start time of run in epoch
+    int64 end = 4;       // End time of run in epoch
+    enum Status {
+        UNKNOWN = 0;
+        READY = 1;
+        RUNNING = 2;
+        FAILED = 3;
+    }
+    Status status = 5;        // Status code of run
+    repeated string logs = 6; // Logs of run
 }

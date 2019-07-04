@@ -3,14 +3,17 @@ package storage
 import (
 	"fmt"
 
+	"github.com/clintjedwards/cursor/api"
 	"github.com/clintjedwards/cursor/config"
 )
 
 // Bucket represents the name of a section of key/value pairs
+// usually a grouping of some sort
+// ex. A key/value pair of userid-userdata would belong in the users bucket
 type Bucket string
 
 const (
-	// PipelinesBucket represents the pipelines bucket
+	// PipelinesBucket represents the container in which pipelines are managed
 	PipelinesBucket Bucket = "pipelines"
 )
 
@@ -26,11 +29,11 @@ const (
 // Engine represents backend storage implementations where items can be persisted
 type Engine interface {
 	Init(config *config.Config) error
-	GetAll(bucket Bucket) (map[string][]byte, error)
-	Get(bucket Bucket, key string) ([]byte, error)
-	Add(bucket Bucket, key string, value []byte) error
-	Update(bucket Bucket, key string, newValue []byte) error
-	Delete(bucket Bucket, key string) error
+	GetAllPipelines(user string) (map[string]*api.Pipeline, error)
+	GetPipelines(user, id string) (*api.Pipeline, error)
+	AddPipelines(user, id string, pipeline *api.Pipeline) error
+	UpdatePipelines(user, id string, pipeline *api.Pipeline) error
+	DeletePipelines(user, id string) error
 }
 
 // InitStorage creates a storage object with the appropriate engine
