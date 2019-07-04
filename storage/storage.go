@@ -29,11 +29,11 @@ const (
 // Engine represents backend storage implementations where items can be persisted
 type Engine interface {
 	Init(config *config.Config) error
-	GetAllPipelines(user string) (map[string]*api.Pipeline, error)
-	GetPipelines(user, id string) (*api.Pipeline, error)
-	AddPipelines(user, id string, pipeline *api.Pipeline) error
-	UpdatePipelines(user, id string, pipeline *api.Pipeline) error
-	DeletePipelines(user, id string) error
+	GetAllPipelines() (map[string]*api.Pipeline, error)
+	GetPipeline(id string) (*api.Pipeline, error)
+	AddPipeline(id string, pipeline *api.Pipeline) error
+	UpdatePipeline(id string, pipeline *api.Pipeline) error
+	DeletePipeline(id string) error
 }
 
 // InitStorage creates a storage object with the appropriate engine

@@ -4,6 +4,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/clintjedwards/cursor/utils"
+
+	"github.com/golang/protobuf/proto"
+
 	"github.com/boltdb/bolt"
 	"github.com/clintjedwards/cursor/api"
 	"github.com/clintjedwards/cursor/config"
@@ -23,7 +27,7 @@ func (boltDB *boltDB) Init(config *config.Config) error {
 
 	boltDB.store = db
 
-	err = boltDB.createBuckets("pipelines")
+	err = boltDB.createBuckets(PipelinesBucket)
 	if err != nil {
 		return err
 	}
@@ -31,17 +35,7 @@ func (boltDB *boltDB) Init(config *config.Config) error {
 	return nil
 }
 
-func (boltDB *boltDB) GetAllPipelines(user string) (map[string]*api.Pipeline, error) {
-	return nil, nil
-}
-func (boltDB *boltDB) GetPipelines(user, id string) (*api.Pipeline, error) {
-	return nil, nil
-}
-func (boltDB *boltDB) AddPipelines(user, id string, pipeline *api.Pipeline) error    { return nil }
-func (boltDB *boltDB) UpdatePipelines(user, id string, pipeline *api.Pipeline) error { return nil }
-func (boltDB *boltDB) DeletePipelines(user, id string) error                         { return nil }
-
-func (boltDB *boltDB) createBuckets(names ...string) error {
+func (boltDB *boltDB) createBuckets(names ...Bucket) error {
 
 	for _, name := range names {
 		err := boltDB.store.Update(func(tx *bolt.Tx) error {
@@ -60,17 +54,27 @@ func (boltDB *boltDB) createBuckets(names ...string) error {
 	return nil
 }
 
-func (boltDB *boltDB) GetAll(bucket Bucket) (map[string][]byte, error) {
-
-	results := map[string][]byte{}
+func (boltDB *boltDB) GetAllPipelines() (map[string]*api.Pipeline, error) {
+	results := map[string]*api.Pipeline{}
 
 	boltDB.store.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(bucket))
+		bucket := tx.Bucket([]byte(PipelinesBucket))
 
-		bucket.ForEach(func(key, value []byte) error {
-			results[string(key)] = value
+		err := bucket.ForEach(func(key, value []byte) error {
+			var pipeline *api.Pipeline
+			err := proto.Unmarshal(value, pipeline)
+			if err != nil {
+				utils.StructuredLog(utils.LogLevelError,
+					"could not unmarshal pipeline while trying to retrieve all",
+					map[string]string{"pipeline_id": string(key), "error": err.Error()})
+				return nil
+			}
+			results[string(key)] = pipeline
 			return nil
 		})
+		if err != nil {
+			return err
+		}
 
 		return nil
 	})
@@ -78,16 +82,52 @@ func (boltDB *boltDB) GetAll(bucket Bucket) (map[string][]byte, error) {
 	return results, nil
 }
 
-func (boltDB *boltDB) Get(bucket Bucket, key string) ([]byte, error) {
-	return nil, nil
+func (boltDB *boltDB) GetPipeline(id string) (*api.Pipeline, error) {
+
+	var storedPipeline *api.Pipeline
+
+	err := boltDB.store.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(PipelinesBucket))
+
+		pipelineRaw := bucket.Get([]byte(id))
+		if pipelineRaw == nil {
+			return utils.ErrPipelineNotFound
+		}
+
+		err := proto.Unmarshal(pipelineRaw, storedPipeline)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return storedPipeline, nil
 }
 
-func (boltDB *boltDB) Add(bucket Bucket, key string, value []byte) error {
-
+func (boltDB *boltDB) AddPipeline(id string, pipeline *api.Pipeline) error {
 	err := boltDB.store.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(bucket))
-		err := bucket.Put([]byte(key), value)
-		return err
+		bucket := tx.Bucket([]byte(PipelinesBucket))
+
+		// First check if key exists
+		currentPipeline := bucket.Get([]byte(id))
+		if currentPipeline != nil {
+			return utils.ErrPipelineExists
+		}
+
+		pipelineRaw, err := proto.Marshal(pipeline)
+		if err != nil {
+			return err
+		}
+
+		err = bucket.Put([]byte(id), pipelineRaw)
+		if err != nil {
+			return err
+		}
+		return nil
 	})
 	if err != nil {
 		return err
@@ -95,10 +135,51 @@ func (boltDB *boltDB) Add(bucket Bucket, key string, value []byte) error {
 	return nil
 }
 
-func (boltDB *boltDB) Update(bucket Bucket, key string, newValue []byte) error {
+func (boltDB *boltDB) UpdatePipeline(id string, pipeline *api.Pipeline) error {
+	err := boltDB.store.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(PipelinesBucket))
+
+		// First check if key exists
+		currentPipeline := bucket.Get([]byte(id))
+		if currentPipeline == nil {
+			return utils.ErrPipelineNotFound
+		}
+
+		pipelineRaw, err := proto.Marshal(pipeline)
+		if err != nil {
+			return err
+		}
+
+		err = bucket.Put([]byte(id), pipelineRaw)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-func (boltDB *boltDB) Delete(bucket Bucket, key string) error {
+func (boltDB *boltDB) DeletePipeline(id string) error {
+	err := boltDB.store.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(PipelinesBucket))
+
+		// First check if key exists
+		currentPipeline := bucket.Get([]byte(id))
+		if currentPipeline == nil {
+			return utils.ErrPipelineNotFound
+		}
+
+		err := bucket.Delete([]byte(id))
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }

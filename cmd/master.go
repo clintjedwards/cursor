@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/clintjedwards/cursor/master"
+	"github.com/clintjedwards/cursor/app"
 	"github.com/spf13/cobra"
 )
 
@@ -12,7 +12,7 @@ var cmdMaster = &cobra.Command{
 }
 
 func runMasterCmd(cme *cobra.Command, args []string) {
-	master.StartServer()
+	app.StartServices()
 }
 
 func init() {
