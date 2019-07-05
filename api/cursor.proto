@@ -59,3 +59,41 @@ message TaskRun {
     Status status = 5;        // Status code of run
     repeated string logs = 6; // Logs of run
 }
+
+service CursorMaster {
+    rpc GetPipeline(GetPipelineRequest) returns (GetPipelineResponse) {}
+    rpc ListPipelines(ListPipelinesRequest) returns (ListPipelinesResponse) {}
+    rpc CreatePipeline(CreatePipelineRequest) returns (CreatePipelineResponse) {}
+    rpc DeletePipeline(DeletePipelineRequest) returns (DeletePipelineResponse) {}
+    rpc RegisterWorker(RegisterWorkerRequest) returns (RegisterWorkerResponse) {}
+}
+
+message CreatePipelineRequest {
+    string name = 1;        // Human readable pipeline name
+    string description = 2; // Short description of what pipeline is used for
+    GitRepo git_repo = 3; // Git information used to download and compile pipeline
+}
+
+message CreatePipelineResponse {
+    string id = 1; // Unique id for pipeline
+}
+
+message GetPipelineRequest {
+    string id = 1;
+}
+message GetPipelineResponse {
+    Pipeline pipeline = 1;
+}
+
+message ListPipelinesRequest {}
+message ListPipelinesResponse {
+    map<string, Pipeline> pipelines = 1;
+}
+
+message DeletePipelineRequest {
+    string id = 1;
+}
+message DeletePipelineResponse {}
+
+message RegisterWorkerRequest {}
+message RegisterWorkerResponse {}

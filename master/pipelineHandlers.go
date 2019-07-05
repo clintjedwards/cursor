@@ -2,6 +2,7 @@ package master
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/clintjedwards/cursor/api"
@@ -37,7 +38,12 @@ func (master *CursorMaster) CreatePipeline(context context.Context, request *api
 		newPipeline.GitRepo.Branch = "master"
 	}
 
-	err := master.storage.AddPipeline(newPipeline.Id, &newPipeline)
+	err := cloneRepository(newPipeline.GitRepo)
+	if err != nil {
+		log.Println(err)
+	}
+
+	err = master.storage.AddPipeline(newPipeline.Id, &newPipeline)
 	if err != nil {
 		return &api.CreatePipelineResponse{}, status.Error(codes.Internal, "could not save pipeline when attempting to create new pipeline")
 	}

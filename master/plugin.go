@@ -5,20 +5,6 @@ package master
 // 	return nil
 // }
 
-// func cloneRepository(repo *api.GitRepo) error {
-
-// 	_, err := git.PlainClone("/tmp/foo", false, &git.CloneOptions{
-// 		URL:           repo.Url,
-// 		ReferenceName: plumbing.NewBranchReferenceName(repo.Branch),
-// 	})
-
-// cloneOptions := &github.CloneOptions{
-// 	Auth:              nil,
-// 	URL:               repo.Url,
-// 	RecurseSubmodules: github.DefaultSubmoduleRecursionDepth,
-// 	SingleBranch:      true,
-// }
-
 // 	return nil
 // }
 

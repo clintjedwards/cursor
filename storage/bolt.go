@@ -61,15 +61,15 @@ func (boltDB *boltDB) GetAllPipelines() (map[string]*api.Pipeline, error) {
 		bucket := tx.Bucket([]byte(PipelinesBucket))
 
 		err := bucket.ForEach(func(key, value []byte) error {
-			var pipeline *api.Pipeline
-			err := proto.Unmarshal(value, pipeline)
+			var pipeline api.Pipeline
+			err := proto.Unmarshal(value, &pipeline)
 			if err != nil {
 				utils.StructuredLog(utils.LogLevelError,
 					"could not unmarshal pipeline while trying to retrieve all",
 					map[string]string{"pipeline_id": string(key), "error": err.Error()})
 				return nil
 			}
-			results[string(key)] = pipeline
+			results[string(key)] = &pipeline
 			return nil
 		})
 		if err != nil {
@@ -84,7 +84,7 @@ func (boltDB *boltDB) GetAllPipelines() (map[string]*api.Pipeline, error) {
 
 func (boltDB *boltDB) GetPipeline(id string) (*api.Pipeline, error) {
 
-	var storedPipeline *api.Pipeline
+	var storedPipeline api.Pipeline
 
 	err := boltDB.store.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(PipelinesBucket))
@@ -94,7 +94,7 @@ func (boltDB *boltDB) GetPipeline(id string) (*api.Pipeline, error) {
 			return utils.ErrPipelineNotFound
 		}
 
-		err := proto.Unmarshal(pipelineRaw, storedPipeline)
+		err := proto.Unmarshal(pipelineRaw, &storedPipeline)
 		if err != nil {
 			return err
 		}
@@ -105,7 +105,7 @@ func (boltDB *boltDB) GetPipeline(id string) (*api.Pipeline, error) {
 		return nil, err
 	}
 
-	return storedPipeline, nil
+	return &storedPipeline, nil
 }
 
 func (boltDB *boltDB) AddPipeline(id string, pipeline *api.Pipeline) error {
