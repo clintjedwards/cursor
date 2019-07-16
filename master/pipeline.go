@@ -16,7 +16,7 @@ func cloneRepository(repo *api.GitRepo) error {
 	return err
 }
 
-func executeBuild() error {
+func buildPlugin(name string) error {
 
 	return nil
 }

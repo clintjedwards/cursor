@@ -3,6 +3,7 @@ package master
 import (
 	"log"
 	"net"
+	"os"
 
 	"github.com/clintjedwards/cursor/api"
 	"github.com/clintjedwards/cursor/config"
@@ -28,10 +29,32 @@ func NewCursorMaster(config *config.Config) *CursorMaster {
 		utils.StructuredLog(utils.LogLevelFatal, "failed init storage", err)
 	}
 
+	createDirectories(config)
+
 	cursorMaster.config = config
 	cursorMaster.storage = storage
 
 	return &cursorMaster
+}
+
+// createDirectroies attempts to create the needed directories to store plugins and repositories
+func createDirectories(config *config.Config) {
+
+	directories := []string{config.Master.PluginDirectoryPath, config.Master.RepoDirectoryPath}
+
+	for _, path := range directories {
+
+		_, err := os.Stat(path)
+
+		if os.IsNotExist(err) {
+			err := os.MkdirAll(path, 0755)
+			if err != nil {
+				utils.StructuredLog(utils.LogLevelFatal, "failed to create needed folders", map[string]string{"err": err.Error(), "folder_name": path})
+			}
+		} else if err != nil {
+			utils.StructuredLog(utils.LogLevelFatal, "failed to create needed folders", map[string]string{"err": err.Error(), "folder_name": path})
+		}
+	}
 }
 
 // CreateGRPCServer creates a grpc server with all the proper settings; TLS enabled
