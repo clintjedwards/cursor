@@ -38,7 +38,12 @@ func (master *CursorMaster) CreatePipeline(context context.Context, request *api
 		newPipeline.GitRepo.Branch = "master"
 	}
 
-	err := cloneRepository(newPipeline.GitRepo)
+	err := master.cloneRepository(newPipeline.Id, newPipeline.GitRepo)
+	if err != nil {
+		log.Println(err)
+	}
+
+	err = master.buildPlugin(newPipeline.Id)
 	if err != nil {
 		log.Println(err)
 	}
@@ -82,7 +87,7 @@ func (master *CursorMaster) GetPipeline(context context.Context, request *api.Ge
 	return &api.GetPipelineResponse{Pipeline: pipeline}, nil
 }
 
-// TODO: Remember to remove the plugins here also
+// DeletePipeline removes a pipeline
 func (master *CursorMaster) DeletePipeline(context context.Context, request *api.DeletePipelineRequest) (*api.DeletePipelineResponse, error) {
 	if request.Id == "" {
 		return &api.DeletePipelineResponse{}, status.Error(codes.FailedPrecondition, "pipeline id required")
