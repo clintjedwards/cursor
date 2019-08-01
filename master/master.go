@@ -9,6 +9,7 @@ import (
 	"github.com/clintjedwards/cursor/config"
 	"github.com/clintjedwards/cursor/storage"
 	"github.com/clintjedwards/cursor/utils"
+	"github.com/hashicorp/go-plugin"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
@@ -16,8 +17,9 @@ import (
 
 // CursorMaster represents a cursor master server
 type CursorMaster struct {
-	storage storage.Engine
-	config  *config.Config
+	storage   storage.Engine
+	config    *config.Config
+	pluginMap map[string]plugin.Plugin
 }
 
 // NewCursorMaster inits a grpc cursor master server
