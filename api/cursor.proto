@@ -3,18 +3,16 @@ syntax = "proto3";
 package api;
 
 message Pipeline {
-    string id = 1;          // Unique ID for pipeline
-    string name = 2;        // Human readable pipeline name
-    string description = 3; // Short description of pipeline's purpose
-    int64 created = 4;      // Time created in epoch
-    int64 modified = 5;     // Time last modified in epoch
-    GitRepo git_repo = 6;  // Git information used to download and compile pipeline
+    string id = 1;                 // Unique ID for pipeline
+    string name = 2;               // Human readable pipeline name
+    string description = 3;        // Short description of pipeline's purpose
+    int64 created = 4;             // Time created in epoch
+    int64 modified = 5;            // Time last modified in epoch
+    // repository_url is the URL where the code to be compiled is located
+    // it should be able to download from most common sources. (eg: git, http, mercurial )
+    // See (https://github.com/hashicorp/go-getter#url-format) for more information on how to form input
+    string repository_url = 6;
     repeated PipelineRun runs = 7; // A record of the last x number of runs attempted
-}
-
-message GitRepo {
-    string url = 1;    // Git URL used to download repository, must be https
-    string branch = 2; // Specific branch
 }
 
 message PipelineRun {
@@ -71,7 +69,9 @@ service CursorMaster {
 message CreatePipelineRequest {
     string name = 1;        // Human readable pipeline name
     string description = 2; // Short description of what pipeline is used for
-    GitRepo git_repo = 3; // Git information used to download and compile pipeline
+    // repository_url is the URL where the code to be compiled is located
+    // it should be able to download from most common sources. (eg: git, http, mercurial )
+    string repository_url = 3;
 }
 
 message CreatePipelineResponse {

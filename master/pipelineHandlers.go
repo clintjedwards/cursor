@@ -2,7 +2,7 @@ package master
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"time"
 
 	"github.com/clintjedwards/cursor/api"
@@ -15,37 +15,30 @@ import (
 func (master *CursorMaster) CreatePipeline(context context.Context, request *api.CreatePipelineRequest) (*api.CreatePipelineResponse, error) {
 
 	newPipeline := api.Pipeline{
-		Id:          string(utils.GenerateRandString(master.config.Master.IDLength)),
-		Name:        request.Name,
-		Description: request.Description,
-		Created:     time.Now().Unix(),
-		Modified:    time.Now().Unix(),
-		GitRepo: &api.GitRepo{
-			Url:    request.GitRepo.Url,
-			Branch: request.GitRepo.Branch,
-		},
+		Id:            string(utils.GenerateRandString(master.config.Master.IDLength)),
+		Name:          request.Name,
+		Description:   request.Description,
+		Created:       time.Now().Unix(),
+		Modified:      time.Now().Unix(),
+		RepositoryUrl: request.RepositoryUrl,
 	}
 
-	if newPipeline.GitRepo.Url == "" {
-		return &api.CreatePipelineResponse{}, status.Error(codes.FailedPrecondition, "git url required")
+	if newPipeline.RepositoryUrl == "" {
+		return &api.CreatePipelineResponse{}, status.Error(codes.FailedPrecondition, "repository url required")
 	}
 
 	if newPipeline.Name == "" {
 		return &api.CreatePipelineResponse{}, status.Error(codes.FailedPrecondition, "name required")
 	}
 
-	if newPipeline.GitRepo.Branch == "" {
-		newPipeline.GitRepo.Branch = "master"
-	}
-
-	err := master.cloneRepository(newPipeline.Id, newPipeline.GitRepo)
+	err := master.getRepository(newPipeline.Id, newPipeline.RepositoryUrl)
 	if err != nil {
-		log.Println(err)
+		return &api.CreatePipelineResponse{}, status.Error(codes.Internal, fmt.Sprintf("could not get repository: %s", err))
 	}
 
 	err = master.buildPlugin(newPipeline.Id)
 	if err != nil {
-		log.Println(err)
+		return &api.CreatePipelineResponse{}, status.Error(codes.Internal, fmt.Sprintf("could not build plugin: %s", err))
 	}
 
 	err = master.storage.AddPipeline(newPipeline.Id, &newPipeline)

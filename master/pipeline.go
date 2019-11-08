@@ -6,16 +6,14 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/clintjedwards/cursor/api"
-	"gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/plumbing"
+	getter "github.com/hashicorp/go-getter"
 )
 
 const (
 	golangBinaryName = "go"
 )
 
-// executeCmd wraps a context around the command and executes it.
+// executeCmd wraps a context around a given command and executes it.
 func executeCmd(path string, args []string, env []string, dir string) ([]byte, error) {
 	// Create context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
@@ -30,16 +28,16 @@ func executeCmd(path string, args []string, env []string, dir string) ([]byte, e
 	return cmd.CombinedOutput()
 }
 
-// cloneRepository is used to download plugin repositories
-func (master *CursorMaster) cloneRepository(pluginID string, repo *api.GitRepo) error {
+// getRepository is used to download plugin repositories. Uses hashicorp's go-getter
+// to provide the ability to download from most string URLs without writing a custom
+// implementation to do so.
+// should be able to download from most common sources. (eg: git, http, mercurial)
+// See (https://github.com/hashicorp/go-getter#url-format) for more information on how to form input
+func (master *CursorMaster) getRepository(pluginID string, repoURL string) error {
 
-	repoPath := fmt.Sprintf("%s/%s", master.config.Master.RepoDirectoryPath, pluginID)
+	cursorRepoPath := fmt.Sprintf("%s/%s", master.config.Master.RepoDirectoryPath, pluginID)
 
-	_, err := git.PlainClone(repoPath, false, &git.CloneOptions{
-		URL:           repo.Url,
-		ReferenceName: plumbing.NewBranchReferenceName(repo.Branch),
-	})
-
+	err := getter.GetAny(cursorRepoPath, repoURL)
 	return err
 }
 

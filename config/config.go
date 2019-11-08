@@ -18,7 +18,6 @@ type BoltDBConfig struct {
 
 // MasterConfig defines config settings for the cursor master
 type MasterConfig struct {
-	URL                 string `envconfig:"cursor_master_url" default:"localhost:8081"`
 	IDLength            int    `envconfig:"cursor_master_id_length" default:"5"` // the length of all randomly generated ids
 	HTTPURL             string `envconfig:"cursor_master_http_url" default:"localhost:8080"`
 	GRPCURL             string `envconfig:"cursor_master_grpc_url" default:"localhost:8081"`
