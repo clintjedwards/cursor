@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package api;
 
+// Pipeline represents a collection of tasks that acheieve a certain end goal
 message Pipeline {
     string id = 1;                 // Unique ID for pipeline
     string name = 2;               // Human readable pipeline name
@@ -12,13 +13,14 @@ message Pipeline {
     // it should be able to download from most common sources. (eg: git, http, mercurial )
     // See (https://github.com/hashicorp/go-getter#url-format) for more information on how to form input
     string repository_url = 6;
-    repeated PipelineRun runs = 7; // A record of the last x number of runs attempted
+    repeated string pipeline_runs = 7; // An ordered list of all pipeline run ids
 }
 
+// PipelineRun represents a single invocation of a pipeline
 message PipelineRun {
-    string id = 1;       // Unique Pipeline run ID
-    int64 start = 2;     // Start time of run in epoch
-    int64 end = 3;       // End time of run in epoch
+    string id = 1;            // Unique Pipeline run ID
+    int64 start = 2;          // Start time of run in epoch
+    int64 end = 3;            // End time of run in epoch
     enum Status {
         UNKNOWN = 0;
         READY = 1;
@@ -29,25 +31,28 @@ message PipelineRun {
     repeated string logs = 5; // Logs of run
 }
 
+// Task is the smallest unit of work. A task accomplishes some hyper specific thing.
+// Many tasks together make up a single pipeline
 message Task {
     string name = 1;
     string description = 2;
-    enum TaskStatus {
+    enum Status {
         UNKNOWN = 0;
         FAILED = 1;
         SUCCESS = 2;
         RUNNING = 3;
         WAITING = 4;
     }
-    TaskStatus task_status = 3;
-    repeated string depends_on = 4;
+    Status status = 3;
+    repeated string children = 4;
 }
 
+// TaskRun represents a single run of a task
 message TaskRun {
     string id = 1;
     string pipeline_run_id = 2;
-    int64 start = 3;     // Start time of run in epoch
-    int64 end = 4;       // End time of run in epoch
+    int64 start = 3;          // Start time of run in epoch
+    int64 end = 4;            // End time of run in epoch
     enum Status {
         UNKNOWN = 0;
         READY = 1;
@@ -62,20 +67,9 @@ service CursorMaster {
     rpc GetPipeline(GetPipelineRequest) returns (GetPipelineResponse) {}
     rpc ListPipelines(ListPipelinesRequest) returns (ListPipelinesResponse) {}
     rpc CreatePipeline(CreatePipelineRequest) returns (CreatePipelineResponse) {}
+    rpc RunPipeline(RunPipelineRequest) returns (RunPipelineResponse) {}
     rpc DeletePipeline(DeletePipelineRequest) returns (DeletePipelineResponse) {}
     rpc RegisterWorker(RegisterWorkerRequest) returns (RegisterWorkerResponse) {}
-}
-
-message CreatePipelineRequest {
-    string name = 1;        // Human readable pipeline name
-    string description = 2; // Short description of what pipeline is used for
-    // repository_url is the URL where the code to be compiled is located
-    // it should be able to download from most common sources. (eg: git, http, mercurial )
-    string repository_url = 3;
-}
-
-message CreatePipelineResponse {
-    string id = 1; // Unique id for pipeline
 }
 
 message GetPipelineRequest {
@@ -90,9 +84,29 @@ message ListPipelinesResponse {
     map<string, Pipeline> pipelines = 1;
 }
 
+message CreatePipelineRequest {
+    string name = 1;        // Human readable pipeline name
+    string description = 2; // Short description of what pipeline is used for
+    // repository_url is the URL where the code to be compiled is located
+    // it should be able to download from most common sources. (eg: git, http, mercurial)
+    // See (https://github.com/hashicorp/go-getter#url-format) for more information on how to form input
+    string repository_url = 3;
+}
+
+message CreatePipelineResponse {
+    string id = 1; // Unique id for pipeline
+}
+
+message RunPipelineRequest {
+    string id = 1;
+}
+
+message RunPipelineResponse {}
+
 message DeletePipelineRequest {
     string id = 1;
 }
+
 message DeletePipelineResponse {}
 
 message RegisterWorkerRequest {}

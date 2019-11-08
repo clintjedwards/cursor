@@ -80,6 +80,22 @@ func (master *CursorMaster) GetPipeline(context context.Context, request *api.Ge
 	return &api.GetPipelineResponse{Pipeline: pipeline}, nil
 }
 
+// RunPipeline removes a pipeline
+func (master *CursorMaster) RunPipeline(context context.Context, request *api.RunPipelineRequest) (*api.RunPipelineResponse, error) {
+	if request.Id == "" {
+		return &api.RunPipelineResponse{}, status.Error(codes.FailedPrecondition, "pipeline id required")
+	}
+
+	// err := master.getRepository(newPipeline.Id, newPipeline.RepositoryUrl)
+	// if err != nil {
+	// 	return &api.CreatePipelineResponse{}, status.Error(codes.Internal, fmt.Sprintf("could not get repository: %s", err))
+	// }
+
+	utils.StructuredLog(utils.LogLevelInfo, "pipeline queued to run", request.Id)
+
+	return &api.RunPipelineResponse{}, nil
+}
+
 // DeletePipeline removes a pipeline
 func (master *CursorMaster) DeletePipeline(context context.Context, request *api.DeletePipelineRequest) (*api.DeletePipelineResponse, error) {
 	if request.Id == "" {
