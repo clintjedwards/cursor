@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/clintjedwards/cursor/api"
+	"github.com/clintjedwards/cursor/plugin"
 	"github.com/clintjedwards/cursor/utils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -45,6 +46,8 @@ func (master *CursorMaster) CreatePipeline(context context.Context, request *api
 	if err != nil {
 		return &api.CreatePipelineResponse{}, status.Error(codes.Internal, "could not save pipeline when attempting to create new pipeline")
 	}
+
+	master.pluginMap[newPipeline.Id] = &plugin.CursorPlugin{}
 
 	utils.StructuredLog(utils.LogLevelInfo, "pipeline created", newPipeline)
 
@@ -86,10 +89,10 @@ func (master *CursorMaster) RunPipeline(context context.Context, request *api.Ru
 		return &api.RunPipelineResponse{}, status.Error(codes.FailedPrecondition, "pipeline id required")
 	}
 
-	// err := master.getRepository(newPipeline.Id, newPipeline.RepositoryUrl)
-	// if err != nil {
-	// 	return &api.CreatePipelineResponse{}, status.Error(codes.Internal, fmt.Sprintf("could not get repository: %s", err))
-	// }
+	err := master.runPipeline(request.Id)
+	if err != nil {
+		return &api.RunPipelineResponse{}, status.Error(codes.Internal, "failed to run pipeline")
+	}
 
 	utils.StructuredLog(utils.LogLevelInfo, "pipeline queued to run", request.Id)
 

@@ -1,2 +1,4 @@
-* Make the output of buildPlugin available in error message
-* Remove plugin in DeletePipeline
+- Make the output of buildPlugin available in error message
+- Flesh out RunPipeline now that it works
+- Create an SDK
+- We should clean up a build if the create fails

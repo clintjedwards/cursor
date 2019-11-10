@@ -35,6 +35,7 @@ func NewCursorMaster(config *config.Config) *CursorMaster {
 
 	cursorMaster.config = config
 	cursorMaster.storage = storage
+	cursorMaster.pluginMap = map[string]plugin.Plugin{}
 
 	return &cursorMaster
 }
