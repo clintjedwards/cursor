@@ -16,6 +16,7 @@ main.js
 
 #protobuf
 *.pb.go
+!cursorPlugin.pb.go
 *_pb.d.ts
 *_pb.js
 *Pb.ts
