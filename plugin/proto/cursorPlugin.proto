@@ -1,8 +1,12 @@
 syntax = "proto3";
 package proto;
 
+message TestResponse {
+    string message = 1;
+}
+
 message Empty {}
 
 service CursorPlugin {
-    rpc ExecuteJob(Empty) returns (Empty);
+    rpc ExecuteJob(Empty) returns (TestResponse);
 }

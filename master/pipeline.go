@@ -6,7 +6,9 @@ import (
 	"os/exec"
 	"time"
 
+	cursorPlugin "github.com/clintjedwards/cursor/plugin"
 	getter "github.com/hashicorp/go-getter"
+	"github.com/hashicorp/go-plugin"
 )
 
 const (
@@ -64,15 +66,16 @@ func (master *CursorMaster) buildPlugin(pluginID string) error {
 
 func (master *CursorMaster) runPipeline(pipelineID string) error {
 
-	// // We're a host. Start by launching the plugin process.
-	// client := plugin.NewClient(&plugin.ClientConfig{
-	// 	HandshakeConfig: shared.Handshake,
-	// 	Plugins:         shared.PluginMap,
-	// 	Cmd:             exec.Command("sh", "-c", os.Getenv("KV_PLUGIN")),
-	// 	AllowedProtocols: []plugin.Protocol{
-	// 		plugin.ProtocolNetRPC, plugin.ProtocolGRPC},
-	// })
-	// defer client.Kill()
+	pluginPath := fmt.Sprintf("%s/%s", master.config.Master.PluginDirectoryPath, pipelineID)
+
+	// We create a client so that we can communicate with plugins aka pipelines
+	client := plugin.NewClient(&plugin.ClientConfig{
+		HandshakeConfig:  cursorPlugin.Handshake,
+		Plugins:          master.pluginMap,
+		Cmd:              exec.Command(pluginPath),
+		AllowedProtocols: []plugin.Protocol{plugin.ProtocolGRPC},
+	})
+	defer client.Kill()
 
 	// // Connect via RPC
 	// rpcClient, err := client.Client()

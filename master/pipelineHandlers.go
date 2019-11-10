@@ -80,7 +80,7 @@ func (master *CursorMaster) GetPipeline(context context.Context, request *api.Ge
 	return &api.GetPipelineResponse{Pipeline: pipeline}, nil
 }
 
-// RunPipeline removes a pipeline
+// RunPipeline triggers a specific pipeline to run
 func (master *CursorMaster) RunPipeline(context context.Context, request *api.RunPipelineRequest) (*api.RunPipelineResponse, error) {
 	if request.Id == "" {
 		return &api.RunPipelineResponse{}, status.Error(codes.FailedPrecondition, "pipeline id required")
