@@ -69,7 +69,8 @@ service CursorMaster {
     rpc CreatePipeline(CreatePipelineRequest) returns (CreatePipelineResponse) {}
     rpc RunPipeline(RunPipelineRequest) returns (RunPipelineResponse) {}
     rpc DeletePipeline(DeletePipelineRequest) returns (DeletePipelineResponse) {}
-    rpc RegisterWorker(RegisterWorkerRequest) returns (RegisterWorkerResponse) {}
+
+    rpc GetPipelineRun(GetPipelineRunRequest) returns (GetPipelineRunResponse) {}
 }
 
 message GetPipelineRequest {
@@ -109,5 +110,11 @@ message DeletePipelineRequest {
 
 message DeletePipelineResponse {}
 
-message RegisterWorkerRequest {}
-message RegisterWorkerResponse {}
+message GetPipelineRunRequest {
+    string pipeline_id = 1; // The ID of the particular pipeline
+    string id = 2;          // The ID of the pipeline run within a certain pipeline
+}
+
+message GetPipelineRunResponse {
+    PipelineRun pipeline_run = 1;
+}

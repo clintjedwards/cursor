@@ -119,7 +119,7 @@ func (master *CursorMaster) DeletePipeline(context context.Context, request *api
 	return &api.DeletePipelineResponse{}, nil
 }
 
-// RegisterWorker connects a new worker with a given cursor master
-func (master *CursorMaster) RegisterWorker(context context.Context, request *api.RegisterWorkerRequest) (*api.RegisterWorkerResponse, error) {
-	return nil, nil
+// GetPipelineRun returns a single pipeline by id
+func (master *CursorMaster) GetPipelineRun(context context.Context, request *api.GetPipelineRunRequest) (*api.GetPipelineRunResponse, error) {
+	return &api.GetPipelineRunResponse{}, nil
 }

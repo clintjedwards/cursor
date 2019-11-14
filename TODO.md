@@ -2,3 +2,4 @@
 - Flesh out RunPipeline now that it works
 - Create an SDK
 - We should clean up a build if the create fails
+- Implement concurrent safe map for plugins and generating pipeline runs

@@ -4,6 +4,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"sync"
 
 	"github.com/clintjedwards/cursor/api"
 	"github.com/clintjedwards/cursor/config"
@@ -17,9 +18,10 @@ import (
 
 // CursorMaster represents a cursor master server
 type CursorMaster struct {
-	storage   storage.Engine
-	config    *config.Config
-	pluginMap map[string]plugin.Plugin
+	storage       storage.Engine
+	config        *config.Config
+	pluginMap     map[string]plugin.Plugin
+	pluginMapLock sync.Mutex
 }
 
 // NewCursorMaster inits a grpc cursor master server
