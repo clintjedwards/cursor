@@ -7,13 +7,16 @@ message Pipeline {
     string id = 1;                 // Unique ID for pipeline
     string name = 2;               // Human readable pipeline name
     string description = 3;        // Short description of pipeline's purpose
-    int64 created = 4;             // Time created in epoch
-    int64 modified = 5;            // Time last modified in epoch
     // repository_url is the URL where the code to be compiled is located
     // it should be able to download from most common sources. (eg: git, http, mercurial )
     // See (https://github.com/hashicorp/go-getter#url-format) for more information on how to form input
-    string repository_url = 6;
-    repeated string pipeline_runs = 7; // An ordered list of all pipeline run ids
+    string repository_url = 4;
+    int64 created = 5;             // Time created in epoch
+    int64 modified = 6;            // Time last modified in epoch
+    int64 last_compiled = 7;       // Shows when last cursor has pulled and compiled a new binary for this pipeline
+    string root_task_id = 8;       // The default task ran when a pipeline run rpc is called without defining one
+    map<string, Task> tasks = 9;   // A map of tasks for quick finding and graph generation
+    repeated string pipeline_runs = 10; // An ordered list of all pipeline run ids
 }
 
 // PipelineRun represents a single invocation of a pipeline
@@ -28,40 +31,31 @@ message PipelineRun {
         FAILED = 3;
     }
     Status status = 4;        // Status code of run
-    repeated string logs = 5; // Logs of run
 }
 
 // Task is the smallest unit of work. A task accomplishes some hyper specific thing.
 // Many tasks together make up a single pipeline
 message Task {
-    string name = 1;
-    string description = 2;
-    enum Status {
-        UNKNOWN = 0;
-        FAILED = 1;
-        SUCCESS = 2;
-        RUNNING = 3;
-        WAITING = 4;
-    }
-    Status status = 3;
+    string id = 1;
+    string name = 2;
+    string description = 3;
     repeated string children = 4;
 }
 
 // TaskRun represents a single run of a task
-message TaskRun {
-    string id = 1;
-    string pipeline_run_id = 2;
-    int64 start = 3;          // Start time of run in epoch
-    int64 end = 4;            // End time of run in epoch
-    enum Status {
-        UNKNOWN = 0;
-        READY = 1;
-        RUNNING = 2;
-        FAILED = 3;
-    }
-    Status status = 5;        // Status code of run
-    repeated string logs = 6; // Logs of run
-}
+// message TaskRun {
+//    string id = 1;
+//    string pipeline_run_id = 2;
+//    int64 start = 3;          // Start time of run in epoch
+//    int64 end = 4;            // End time of run in epoch
+//    enum Status {
+//        UNKNOWN = 0;
+//        READY = 1;
+//        RUNNING = 2;
+//        FAILED = 3;
+//    }
+//    Status status = 5;        // Status code of run
+//}
 
 service CursorMaster {
     rpc GetPipeline(GetPipelineRequest) returns (GetPipelineResponse) {}
@@ -100,6 +94,10 @@ message CreatePipelineResponse {
 
 message RunPipelineRequest {
     string id = 1;
+    // A specific task to run other than the default. If this is empty the root task defined in pipeline will be run.
+    string task_id = 2;
+    // Run the entire graph of tasks. If this is set to false, cursor will not execute the children of the job to be ran.
+    bool execute_chain = 3;
 }
 
 message RunPipelineResponse {}

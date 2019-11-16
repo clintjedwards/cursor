@@ -10,7 +10,7 @@ import (
 
 // GRPCServer is the implementation that allows the plugin to respond to requests from the host
 type GRPCServer struct {
-	Impl Pipeline
+	Impl PipelineDefinition
 }
 
 // GRPCServer is the server implementation that allows our plugins to recieve RPCs

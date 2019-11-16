@@ -90,7 +90,11 @@ func (master *CursorMaster) runPipeline(pipelineID string) error {
 	}
 
 	pipeline := raw.(cursorPlugin.Pipeline)
-	message, _ := pipeline.ExecuteJob()
+	message, _ := pipeline.ExecuteTask()
+
+	// TODO: recusively Executetask and paralize with waitgroups intelligently
+	// Possibly also make it so that if one child fails the entire pipeline is
+	// stopped and marked as a failure while still recording the other task.
 	fmt.Println(message)
 
 	return nil

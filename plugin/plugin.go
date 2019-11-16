@@ -13,8 +13,8 @@ var Handshake = plugin.HandshakeConfig{
 	MagicCookieValue: "cKykOnGDBJ",
 }
 
-// Pipeline is the interface in which both the plugin and the host has to implement
-type Pipeline interface {
+// PipelineDefinition is the interface in which both the plugin and the host has to implement
+type PipelineDefinition interface {
 	ExecuteJob() (string, error)
 }
 
@@ -22,5 +22,5 @@ type Pipeline interface {
 // it allows us to serve/consume the plugin
 type CursorPlugin struct {
 	plugin.Plugin
-	Impl Pipeline
+	Impl PipelineDefinition
 }
