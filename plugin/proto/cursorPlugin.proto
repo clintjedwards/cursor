@@ -10,6 +10,10 @@ message TaskInfo {
 }
 
 service CursorPlugin {
+  // GetPipelineInfo is called upon compiling the pipeline so that cursor knowns
+  // the structure of the tasks.
+  // It returns a task info map that describes what kind of tasks exist in the
+  // pipeline and a default task used as the root task
   rpc GetPipelineInfo(GetPipelineInfoRequest) returns (GetPipelineInfoResponse);
   rpc ExecuteTask(ExecuteTaskRequest) returns (ExecuteTaskResponse);
 }

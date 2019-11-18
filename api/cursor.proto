@@ -52,10 +52,9 @@ message PipelineRun {
 // Task is the smallest unit of work, it accomplishes a small part of an entire
 // pipeline. Many tasks together make up a single pipeline.
 message Task {
-  string id = 1;
-  string name = 2;
-  string description = 3;
-  repeated string children = 4;
+  string name = 1;
+  string description = 2;
+  repeated string children = 3;
 }
 
 // TaskRun represents a single run of a task
@@ -117,9 +116,11 @@ message RunPipelineRequest {
   // A specific task to run other than the default. If this is empty the root
   // task defined in pipeline will be run.
   string task_id = 2;
-  // Run the entire graph of tasks. If this is set to false, cursor will not
-  // execute the children of the job to be ran.
-  bool execute_chain = 3;
+  // run_single_task controls if cursor will attempt to run the chain of tasks
+  // after the original task has been run. (cursor will attempt to run task
+  // children). Setting this to true will cause cursor to stop running tasks at
+  // the task given (or the default pipeline task)
+  bool run_single_task = 3;
 }
 
 message RunPipelineResponse {

@@ -1,6 +1,5 @@
 - Make the output of buildPlugin available in error message
 - Flesh out RunPipeline now that it works
-- Create an SDK
 - We should clean up a build if the create fails
 - Implement concurrent safe map for plugins and generating pipeline runs/or database these things..probably database
 - Clean up a build if the create fails
@@ -13,3 +12,5 @@
 - Check for any tasks that are in the map but are unable to be reached
 - All these checks should fail the run and return a proper error so that that user can fix it
 - Tasks should eventually properly show us logs
+- Investigate using value passes instead of reference passes for ExecuteTask and friends
+- Save plugins as they are added and reload them from the database on application startup

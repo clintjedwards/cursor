@@ -15,32 +15,47 @@ import (
 // CreatePipeline registers a new pipeline
 func (master *CursorMaster) CreatePipeline(context context.Context, request *api.CreatePipelineRequest) (*api.CreatePipelineResponse, error) {
 
-	newPipeline := api.Pipeline{
-		Id:            string(utils.GenerateRandString(master.config.Master.IDLength)),
-		Name:          request.Name,
-		Description:   request.Description,
-		Created:       time.Now().Unix(),
-		Modified:      time.Now().Unix(),
-		RepositoryUrl: request.RepositoryUrl,
-	}
-
-	if newPipeline.RepositoryUrl == "" {
+	// Validate user input
+	if request.RepositoryUrl == "" {
 		return &api.CreatePipelineResponse{}, status.Error(codes.FailedPrecondition, "repository url required")
 	}
 
-	if newPipeline.Name == "" {
+	if request.Name == "" {
 		return &api.CreatePipelineResponse{}, status.Error(codes.FailedPrecondition, "name required")
 	}
 
-	err := master.getRepository(newPipeline.Id, newPipeline.RepositoryUrl)
+	// Generate Pipeline unique ID
+	pipelineID := string(utils.GenerateRandString(master.config.Master.IDLength))
+
+	err := master.getRepository(pipelineID, request.RepositoryUrl)
 	if err != nil {
 		return &api.CreatePipelineResponse{}, status.Error(codes.Internal, fmt.Sprintf("could not get repository: %s", err))
 	}
 
-	err = master.buildPlugin(newPipeline.Id)
+	err = master.buildPlugin(pipelineID)
 	if err != nil {
 		return &api.CreatePipelineResponse{}, status.Error(codes.Internal, fmt.Sprintf("could not build plugin: %s", err))
 	}
+
+	pipelineInfo, err := master.getPipelineInfo(pipelineID)
+	if err != nil {
+		return &api.CreatePipelineResponse{}, status.Error(codes.Internal, fmt.Sprintf("could not get pipeline info from plugin: %s", err))
+	}
+
+	newPipeline := api.Pipeline{
+		Id:            pipelineID,
+		Name:          request.Name,
+		Description:   request.Description,
+		RepositoryUrl: request.RepositoryUrl,
+		Created:       time.Now().Unix(),
+		Modified:      time.Now().Unix(),
+		LastCompiled:  time.Now().Unix(),
+		RootTaskId:    pipelineInfo.RootTask,
+		Tasks:         pipelineInfo.Tasks,
+	}
+
+	taskMap :=
+	//newPipeline
 
 	err = master.storage.AddPipeline(newPipeline.Id, &newPipeline)
 	if err != nil {
@@ -89,7 +104,12 @@ func (master *CursorMaster) RunPipeline(context context.Context, request *api.Ru
 		return &api.RunPipelineResponse{}, status.Error(codes.FailedPrecondition, "pipeline id required")
 	}
 
-	err := master.runPipeline(request.Id)
+	taskID := request.TaskId
+	if taskID == "" {
+		// TODO: Get pipeline here and figure out what the root task is
+	}
+
+	err := master.runTasks(request.Id, taskID)
 	if err != nil {
 		return &api.RunPipelineResponse{}, status.Error(codes.Internal, "failed to run pipeline")
 	}

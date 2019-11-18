@@ -19,8 +19,18 @@ func (p *CursorPlugin) GRPCServer(broker *plugin.GRPCBroker, s *grpc.Server) err
 	return nil
 }
 
-// ExecuteJob is the implementation for how the plugins should respond to the client
-func (m *GRPCServer) ExecuteJob(ctx context.Context, req *proto.Empty) (*proto.TestResponse, error) {
-	message, err := m.Impl.ExecuteJob()
-	return &proto.TestResponse{Message: message}, err
+// Below are wrappers for how plugins should respond to the RPC in question
+// They are all pretty simple since the general flow is to just call the implementation
+// of the rpc method for that specific plugin and return the result
+
+// ExecuteTask executes a single task on a plugin
+func (m *GRPCServer) ExecuteTask(ctx context.Context, request *proto.ExecuteTaskRequest) (*proto.ExecuteTaskResponse, error) {
+	response, err := m.Impl.ExecuteTask(request)
+	return response, err
+}
+
+// GetPipelineInfo executes a single task on a plugin
+func (m *GRPCServer) GetPipelineInfo(ctx context.Context, request *proto.GetPipelineInfoRequest) (*proto.GetPipelineInfoResponse, error) {
+	response, err := m.Impl.GetPipelineInfo(request)
+	return response, err
 }

@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"github.com/clintjedwards/cursor/plugin/proto"
 	"github.com/hashicorp/go-plugin"
 )
 
@@ -15,7 +16,8 @@ var Handshake = plugin.HandshakeConfig{
 
 // PipelineDefinition is the interface in which both the plugin and the host has to implement
 type PipelineDefinition interface {
-	ExecuteJob() (string, error)
+	ExecuteTask(request *proto.ExecuteTaskRequest) (*proto.ExecuteTaskResponse, error)
+	GetPipelineInfo(request *proto.GetPipelineInfoRequest) (*proto.GetPipelineInfoResponse, error)
 }
 
 // CursorPlugin is just a wrapper so we implement the correct go-plugin interface

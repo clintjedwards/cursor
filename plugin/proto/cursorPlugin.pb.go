@@ -333,6 +333,10 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type CursorPluginClient interface {
+	// GetPipelineInfo is called upon compiling the pipeline so that cursor knowns
+	// the structure of the tasks.
+	// It returns a task info map that describes what kind of tasks exist in the
+	// pipeline and a default task used as the root task
 	GetPipelineInfo(ctx context.Context, in *GetPipelineInfoRequest, opts ...grpc.CallOption) (*GetPipelineInfoResponse, error)
 	ExecuteTask(ctx context.Context, in *ExecuteTaskRequest, opts ...grpc.CallOption) (*ExecuteTaskResponse, error)
 }
@@ -365,6 +369,10 @@ func (c *cursorPluginClient) ExecuteTask(ctx context.Context, in *ExecuteTaskReq
 
 // CursorPluginServer is the server API for CursorPlugin service.
 type CursorPluginServer interface {
+	// GetPipelineInfo is called upon compiling the pipeline so that cursor knowns
+	// the structure of the tasks.
+	// It returns a task info map that describes what kind of tasks exist in the
+	// pipeline and a default task used as the root task
 	GetPipelineInfo(context.Context, *GetPipelineInfoRequest) (*GetPipelineInfoResponse, error)
 	ExecuteTask(context.Context, *ExecuteTaskRequest) (*ExecuteTaskResponse, error)
 }

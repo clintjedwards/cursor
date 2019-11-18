@@ -7,6 +7,7 @@ import (
 	"time"
 
 	cursorPlugin "github.com/clintjedwards/cursor/plugin"
+	proto "github.com/clintjedwards/cursor/plugin/proto"
 	getter "github.com/hashicorp/go-getter"
 	"github.com/hashicorp/go-plugin"
 )
@@ -44,6 +45,7 @@ func (master *CursorMaster) getRepository(pluginID string, repoURL string) error
 }
 
 // buildPlugin attempts to compile and store a specified plugin
+// TODO: should clean up after itself if it fails
 func (master *CursorMaster) buildPlugin(pluginID string) error {
 
 	repoPath := fmt.Sprintf("%s/%s", master.config.Master.RepoDirectoryPath, pluginID)
@@ -64,7 +66,42 @@ func (master *CursorMaster) buildPlugin(pluginID string) error {
 	return nil
 }
 
-func (master *CursorMaster) runPipeline(pipelineID string) error {
+func (master *CursorMaster) getPipelineInfo(pipelineID string) (proto.GetPipelineInfoResponse, error) {
+
+	pluginPath := fmt.Sprintf("%s/%s", master.config.Master.PluginDirectoryPath, pipelineID)
+
+	// We create a client so that we can communicate with plugins aka pipelines
+	client := plugin.NewClient(&plugin.ClientConfig{
+		HandshakeConfig:  cursorPlugin.Handshake,
+		Plugins:          master.pluginMap,
+		Cmd:              exec.Command(pluginPath),
+		AllowedProtocols: []plugin.Protocol{plugin.ProtocolGRPC},
+	})
+	defer client.Kill()
+
+	// Connect via RPC
+	rpcClient, err := client.Client()
+	if err != nil {
+		return proto.GetPipelineInfoResponse{}, err
+	}
+
+	// Request the plugin
+	raw, err := rpcClient.Dispense(pipelineID)
+	if err != nil {
+		return proto.GetPipelineInfoResponse{}, err
+	}
+
+	pipeline := raw.(cursorPlugin.PipelineDefinition)
+	response, err := pipeline.GetPipelineInfo(&proto.GetPipelineInfoRequest{})
+	if err != nil {
+		return proto.GetPipelineInfoResponse{}, err
+	}
+
+	return *response, nil
+}
+
+// runTasks checks the plugins loaded for the specific task to run
+func (master *CursorMaster) runTasks(pipelineID, taskID string) error {
 
 	pluginPath := fmt.Sprintf("%s/%s", master.config.Master.PluginDirectoryPath, pipelineID)
 
@@ -89,8 +126,13 @@ func (master *CursorMaster) runPipeline(pipelineID string) error {
 		return err
 	}
 
-	pipeline := raw.(cursorPlugin.Pipeline)
-	message, _ := pipeline.ExecuteTask()
+	pipeline := raw.(cursorPlugin.PipelineDefinition)
+	message, err := pipeline.ExecuteTask(&proto.ExecuteTaskRequest{
+		Id: taskID,
+	})
+	if err != nil {
+		return err
+	}
 
 	// TODO: recusively Executetask and paralize with waitgroups intelligently
 	// Possibly also make it so that if one child fails the entire pipeline is

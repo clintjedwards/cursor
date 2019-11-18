@@ -16,11 +16,24 @@ func (p *CursorPlugin) GRPCClient(ctx context.Context, broker *plugin.GRPCBroker
 	return &GRPCClient{client: proto.NewCursorPluginClient(c)}, nil
 }
 
-// ExecuteJob calls ExecuteJob on the plugin through the GRPC client
-func (m *GRPCClient) ExecuteJob() (string, error) {
-	ret, err := m.client.ExecuteJob(context.Background(), &proto.Empty{})
+// Below are wrappers for how plugins should respond to the RPC in question
+// They are all pretty simple since the general flow is to just call the implementation
+// of the rpc method for that specific plugin and return the result
+
+// ExecuteTask calls ExecuteTask on the plugin through the GRPC client
+func (m *GRPCClient) ExecuteTask(request *proto.ExecuteTaskRequest) (*proto.ExecuteTaskResponse, error) {
+	response, err := m.client.ExecuteTask(context.Background(), request)
 	if err != nil {
-		return "", err
+		return &proto.ExecuteTaskResponse{}, err
 	}
-	return ret.Message, nil
+	return response, nil
+}
+
+// GetPipelineInfo calls GetPipelineInfo on the plugin through the GRPC client
+func (m *GRPCClient) GetPipelineInfo(request *proto.GetPipelineInfoRequest) (*proto.GetPipelineInfoResponse, error) {
+	response, err := m.client.GetPipelineInfo(context.Background(), request)
+	if err != nil {
+		return &proto.GetPipelineInfoResponse{}, err
+	}
+	return response, nil
 }
