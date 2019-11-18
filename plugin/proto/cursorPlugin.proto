@@ -1,13 +1,12 @@
 syntax = "proto3";
 package proto;
 
-// Task is the smallest unit of work. A task accomplishes some hyper specific
-// thing.
-// Many tasks together make up a single pipeline
+// Task is the smallest unit of work, it accomplishes a small part of an entire
+// pipeline. Many tasks together make up a single pipeline.
 message TaskInfo {
-  string name = 2;
-  string description = 3;
-  repeated string children = 4;
+  string name = 1;
+  string description = 2;
+  repeated string children = 3;
 }
 
 service CursorPlugin {

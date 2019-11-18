@@ -8,6 +8,8 @@ import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -22,94 +24,301 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-type TestResponse struct {
-	Message              string   `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+type ExecuteTaskResponse_Status int32
+
+const (
+	ExecuteTaskResponse_UNKNOWN ExecuteTaskResponse_Status = 0
+	ExecuteTaskResponse_FAILED  ExecuteTaskResponse_Status = 1
+	ExecuteTaskResponse_SUCCESS ExecuteTaskResponse_Status = 2
+	ExecuteTaskResponse_RUNNING ExecuteTaskResponse_Status = 3
+	ExecuteTaskResponse_WAITING ExecuteTaskResponse_Status = 4
+)
+
+var ExecuteTaskResponse_Status_name = map[int32]string{
+	0: "UNKNOWN",
+	1: "FAILED",
+	2: "SUCCESS",
+	3: "RUNNING",
+	4: "WAITING",
+}
+
+var ExecuteTaskResponse_Status_value = map[string]int32{
+	"UNKNOWN": 0,
+	"FAILED":  1,
+	"SUCCESS": 2,
+	"RUNNING": 3,
+	"WAITING": 4,
+}
+
+func (x ExecuteTaskResponse_Status) String() string {
+	return proto.EnumName(ExecuteTaskResponse_Status_name, int32(x))
+}
+
+func (ExecuteTaskResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_f0f3a40d65296300, []int{4, 0}
+}
+
+// Task is the smallest unit of work, it accomplishes a small part of an entire
+// pipeline. Many tasks together make up a single pipeline.
+type TaskInfo struct {
+	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Description          string   `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	Children             []string `protobuf:"bytes,3,rep,name=children,proto3" json:"children,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *TestResponse) Reset()         { *m = TestResponse{} }
-func (m *TestResponse) String() string { return proto.CompactTextString(m) }
-func (*TestResponse) ProtoMessage()    {}
-func (*TestResponse) Descriptor() ([]byte, []int) {
+func (m *TaskInfo) Reset()         { *m = TaskInfo{} }
+func (m *TaskInfo) String() string { return proto.CompactTextString(m) }
+func (*TaskInfo) ProtoMessage()    {}
+func (*TaskInfo) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f0f3a40d65296300, []int{0}
 }
 
-func (m *TestResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_TestResponse.Unmarshal(m, b)
+func (m *TaskInfo) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_TaskInfo.Unmarshal(m, b)
 }
-func (m *TestResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_TestResponse.Marshal(b, m, deterministic)
+func (m *TaskInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_TaskInfo.Marshal(b, m, deterministic)
 }
-func (m *TestResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_TestResponse.Merge(m, src)
+func (m *TaskInfo) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TaskInfo.Merge(m, src)
 }
-func (m *TestResponse) XXX_Size() int {
-	return xxx_messageInfo_TestResponse.Size(m)
+func (m *TaskInfo) XXX_Size() int {
+	return xxx_messageInfo_TaskInfo.Size(m)
 }
-func (m *TestResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_TestResponse.DiscardUnknown(m)
+func (m *TaskInfo) XXX_DiscardUnknown() {
+	xxx_messageInfo_TaskInfo.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_TestResponse proto.InternalMessageInfo
+var xxx_messageInfo_TaskInfo proto.InternalMessageInfo
 
-func (m *TestResponse) GetMessage() string {
+func (m *TaskInfo) GetName() string {
 	if m != nil {
-		return m.Message
+		return m.Name
 	}
 	return ""
 }
 
-type Empty struct {
+func (m *TaskInfo) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *TaskInfo) GetChildren() []string {
+	if m != nil {
+		return m.Children
+	}
+	return nil
+}
+
+type GetPipelineInfoRequest struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *Empty) Reset()         { *m = Empty{} }
-func (m *Empty) String() string { return proto.CompactTextString(m) }
-func (*Empty) ProtoMessage()    {}
-func (*Empty) Descriptor() ([]byte, []int) {
+func (m *GetPipelineInfoRequest) Reset()         { *m = GetPipelineInfoRequest{} }
+func (m *GetPipelineInfoRequest) String() string { return proto.CompactTextString(m) }
+func (*GetPipelineInfoRequest) ProtoMessage()    {}
+func (*GetPipelineInfoRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f0f3a40d65296300, []int{1}
 }
 
-func (m *Empty) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Empty.Unmarshal(m, b)
+func (m *GetPipelineInfoRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetPipelineInfoRequest.Unmarshal(m, b)
 }
-func (m *Empty) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Empty.Marshal(b, m, deterministic)
+func (m *GetPipelineInfoRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetPipelineInfoRequest.Marshal(b, m, deterministic)
 }
-func (m *Empty) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Empty.Merge(m, src)
+func (m *GetPipelineInfoRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetPipelineInfoRequest.Merge(m, src)
 }
-func (m *Empty) XXX_Size() int {
-	return xxx_messageInfo_Empty.Size(m)
+func (m *GetPipelineInfoRequest) XXX_Size() int {
+	return xxx_messageInfo_GetPipelineInfoRequest.Size(m)
 }
-func (m *Empty) XXX_DiscardUnknown() {
-	xxx_messageInfo_Empty.DiscardUnknown(m)
+func (m *GetPipelineInfoRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetPipelineInfoRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Empty proto.InternalMessageInfo
+var xxx_messageInfo_GetPipelineInfoRequest proto.InternalMessageInfo
+
+type GetPipelineInfoResponse struct {
+	RootTask             string               `protobuf:"bytes,1,opt,name=root_task,json=rootTask,proto3" json:"root_task,omitempty"`
+	Tasks                map[string]*TaskInfo `protobuf:"bytes,2,rep,name=tasks,proto3" json:"tasks,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
+	XXX_unrecognized     []byte               `json:"-"`
+	XXX_sizecache        int32                `json:"-"`
+}
+
+func (m *GetPipelineInfoResponse) Reset()         { *m = GetPipelineInfoResponse{} }
+func (m *GetPipelineInfoResponse) String() string { return proto.CompactTextString(m) }
+func (*GetPipelineInfoResponse) ProtoMessage()    {}
+func (*GetPipelineInfoResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_f0f3a40d65296300, []int{2}
+}
+
+func (m *GetPipelineInfoResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetPipelineInfoResponse.Unmarshal(m, b)
+}
+func (m *GetPipelineInfoResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetPipelineInfoResponse.Marshal(b, m, deterministic)
+}
+func (m *GetPipelineInfoResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetPipelineInfoResponse.Merge(m, src)
+}
+func (m *GetPipelineInfoResponse) XXX_Size() int {
+	return xxx_messageInfo_GetPipelineInfoResponse.Size(m)
+}
+func (m *GetPipelineInfoResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetPipelineInfoResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetPipelineInfoResponse proto.InternalMessageInfo
+
+func (m *GetPipelineInfoResponse) GetRootTask() string {
+	if m != nil {
+		return m.RootTask
+	}
+	return ""
+}
+
+func (m *GetPipelineInfoResponse) GetTasks() map[string]*TaskInfo {
+	if m != nil {
+		return m.Tasks
+	}
+	return nil
+}
+
+type ExecuteTaskRequest struct {
+	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ExecuteTaskRequest) Reset()         { *m = ExecuteTaskRequest{} }
+func (m *ExecuteTaskRequest) String() string { return proto.CompactTextString(m) }
+func (*ExecuteTaskRequest) ProtoMessage()    {}
+func (*ExecuteTaskRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_f0f3a40d65296300, []int{3}
+}
+
+func (m *ExecuteTaskRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ExecuteTaskRequest.Unmarshal(m, b)
+}
+func (m *ExecuteTaskRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ExecuteTaskRequest.Marshal(b, m, deterministic)
+}
+func (m *ExecuteTaskRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ExecuteTaskRequest.Merge(m, src)
+}
+func (m *ExecuteTaskRequest) XXX_Size() int {
+	return xxx_messageInfo_ExecuteTaskRequest.Size(m)
+}
+func (m *ExecuteTaskRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ExecuteTaskRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ExecuteTaskRequest proto.InternalMessageInfo
+
+func (m *ExecuteTaskRequest) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+type ExecuteTaskResponse struct {
+	Status               ExecuteTaskResponse_Status `protobuf:"varint,1,opt,name=status,proto3,enum=proto.ExecuteTaskResponse_Status" json:"status,omitempty"`
+	Children             []string                   `protobuf:"bytes,2,rep,name=children,proto3" json:"children,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                   `json:"-"`
+	XXX_unrecognized     []byte                     `json:"-"`
+	XXX_sizecache        int32                      `json:"-"`
+}
+
+func (m *ExecuteTaskResponse) Reset()         { *m = ExecuteTaskResponse{} }
+func (m *ExecuteTaskResponse) String() string { return proto.CompactTextString(m) }
+func (*ExecuteTaskResponse) ProtoMessage()    {}
+func (*ExecuteTaskResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_f0f3a40d65296300, []int{4}
+}
+
+func (m *ExecuteTaskResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ExecuteTaskResponse.Unmarshal(m, b)
+}
+func (m *ExecuteTaskResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ExecuteTaskResponse.Marshal(b, m, deterministic)
+}
+func (m *ExecuteTaskResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ExecuteTaskResponse.Merge(m, src)
+}
+func (m *ExecuteTaskResponse) XXX_Size() int {
+	return xxx_messageInfo_ExecuteTaskResponse.Size(m)
+}
+func (m *ExecuteTaskResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ExecuteTaskResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ExecuteTaskResponse proto.InternalMessageInfo
+
+func (m *ExecuteTaskResponse) GetStatus() ExecuteTaskResponse_Status {
+	if m != nil {
+		return m.Status
+	}
+	return ExecuteTaskResponse_UNKNOWN
+}
+
+func (m *ExecuteTaskResponse) GetChildren() []string {
+	if m != nil {
+		return m.Children
+	}
+	return nil
+}
 
 func init() {
-	proto.RegisterType((*TestResponse)(nil), "proto.TestResponse")
-	proto.RegisterType((*Empty)(nil), "proto.Empty")
+	proto.RegisterEnum("proto.ExecuteTaskResponse_Status", ExecuteTaskResponse_Status_name, ExecuteTaskResponse_Status_value)
+	proto.RegisterType((*TaskInfo)(nil), "proto.TaskInfo")
+	proto.RegisterType((*GetPipelineInfoRequest)(nil), "proto.GetPipelineInfoRequest")
+	proto.RegisterType((*GetPipelineInfoResponse)(nil), "proto.GetPipelineInfoResponse")
+	proto.RegisterMapType((map[string]*TaskInfo)(nil), "proto.GetPipelineInfoResponse.TasksEntry")
+	proto.RegisterType((*ExecuteTaskRequest)(nil), "proto.ExecuteTaskRequest")
+	proto.RegisterType((*ExecuteTaskResponse)(nil), "proto.ExecuteTaskResponse")
 }
 
 func init() { proto.RegisterFile("plugin/proto/cursorPlugin.proto", fileDescriptor_f0f3a40d65296300) }
 
 var fileDescriptor_f0f3a40d65296300 = []byte{
-	// 138 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x2f, 0xc8, 0x29, 0x4d,
-	0xcf, 0xcc, 0xd3, 0x2f, 0x28, 0xca, 0x2f, 0xc9, 0xd7, 0x4f, 0x2e, 0x2d, 0x2a, 0xce, 0x2f, 0x0a,
-	0x00, 0x0b, 0xe9, 0x81, 0x85, 0x84, 0x58, 0xc1, 0x94, 0x92, 0x06, 0x17, 0x4f, 0x48, 0x6a, 0x71,
-	0x49, 0x50, 0x6a, 0x71, 0x41, 0x7e, 0x5e, 0x71, 0xaa, 0x90, 0x04, 0x17, 0x7b, 0x6e, 0x6a, 0x71,
-	0x71, 0x62, 0x7a, 0xaa, 0x04, 0xa3, 0x02, 0xa3, 0x06, 0x67, 0x10, 0x8c, 0xab, 0xc4, 0xce, 0xc5,
-	0xea, 0x9a, 0x5b, 0x50, 0x52, 0x69, 0x64, 0xcf, 0xc5, 0xe3, 0x8c, 0x64, 0x9e, 0x90, 0x3e, 0x17,
-	0x97, 0x6b, 0x45, 0x6a, 0x72, 0x69, 0x49, 0xaa, 0x57, 0x7e, 0x92, 0x10, 0x0f, 0xc4, 0x7c, 0x3d,
-	0xb0, 0x5a, 0x29, 0x61, 0x28, 0x0f, 0xd9, 0x8e, 0x24, 0x36, 0xb0, 0x98, 0x31, 0x20, 0x00, 0x00,
-	0xff, 0xff, 0x9a, 0x43, 0x1d, 0x7f, 0xa4, 0x00, 0x00, 0x00,
+	// 416 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x52, 0xd1, 0x8e, 0x93, 0x40,
+	0x14, 0x15, 0xd8, 0xd6, 0xf6, 0x62, 0x76, 0xc9, 0x35, 0x51, 0xac, 0x51, 0x91, 0x68, 0x52, 0x5f,
+	0xd8, 0x04, 0x5f, 0xd4, 0x17, 0xb3, 0xe9, 0xe2, 0x4a, 0x34, 0xd8, 0xc0, 0x36, 0xfb, 0x62, 0x62,
+	0x10, 0x46, 0x9d, 0x14, 0x67, 0x90, 0x19, 0x8c, 0xfb, 0x43, 0x7e, 0x82, 0x1f, 0xe0, 0x97, 0x99,
+	0x19, 0x46, 0xed, 0xae, 0xad, 0x4f, 0xcc, 0x3d, 0xe7, 0xdc, 0x7b, 0xe7, 0x1c, 0x06, 0xee, 0xb5,
+	0x4d, 0xff, 0x91, 0xb2, 0xc3, 0xb6, 0xe3, 0x92, 0x1f, 0x56, 0x7d, 0x27, 0x78, 0xb7, 0xd4, 0x50,
+	0xa4, 0x21, 0x1c, 0xe9, 0x4f, 0xf8, 0x16, 0x26, 0xa7, 0xa5, 0x58, 0xa7, 0xec, 0x03, 0x47, 0x84,
+	0x3d, 0x56, 0x7e, 0x26, 0xbe, 0x15, 0x58, 0xf3, 0x69, 0xae, 0xcf, 0x18, 0x80, 0x5b, 0x13, 0x51,
+	0x75, 0xb4, 0x95, 0x94, 0x33, 0xdf, 0xd6, 0xd4, 0x26, 0x84, 0x33, 0x98, 0x54, 0x9f, 0x68, 0x53,
+	0x77, 0x84, 0xf9, 0x4e, 0xe0, 0xcc, 0xa7, 0xf9, 0x9f, 0x3a, 0xf4, 0xe1, 0xc6, 0x09, 0x91, 0x4b,
+	0xda, 0x92, 0x86, 0x32, 0xa2, 0x96, 0xe4, 0xe4, 0x4b, 0x4f, 0x84, 0x0c, 0x7f, 0x5a, 0x70, 0xf3,
+	0x1f, 0x4a, 0xb4, 0x9c, 0x09, 0x82, 0xb7, 0x61, 0xda, 0x71, 0x2e, 0xdf, 0xc9, 0x52, 0xac, 0xcd,
+	0x65, 0x26, 0x0a, 0x50, 0x17, 0xc5, 0xe7, 0x30, 0x52, 0xb8, 0xf0, 0xed, 0xc0, 0x99, 0xbb, 0xf1,
+	0xa3, 0xc1, 0x4e, 0xb4, 0x63, 0x56, 0xa4, 0x7a, 0x44, 0xc2, 0x64, 0x77, 0x9e, 0x0f, 0x7d, 0xb3,
+	0x14, 0xe0, 0x2f, 0x88, 0x1e, 0x38, 0x6b, 0x72, 0x6e, 0xb6, 0xa8, 0x23, 0x3e, 0x84, 0xd1, 0xd7,
+	0xb2, 0xe9, 0x89, 0xf6, 0xea, 0xc6, 0x07, 0x66, 0xc1, 0xef, 0x94, 0xf2, 0x81, 0x7d, 0x66, 0x3f,
+	0xb1, 0xc2, 0x07, 0x80, 0xc9, 0x37, 0x52, 0xf5, 0x92, 0x28, 0xd6, 0x58, 0xc3, 0x7d, 0xb0, 0x69,
+	0x6d, 0x26, 0xda, 0xb4, 0x0e, 0x7f, 0x58, 0x70, 0xfd, 0x82, 0xcc, 0xd8, 0x7c, 0x0a, 0x63, 0x21,
+	0x4b, 0xd9, 0x0b, 0xad, 0xdd, 0x8f, 0xef, 0x9b, 0x4d, 0x5b, 0xb4, 0x51, 0xa1, 0x85, 0xb9, 0x69,
+	0xb8, 0x90, 0xb9, 0x7d, 0x29, 0xf3, 0x97, 0x30, 0x1e, 0xd4, 0xe8, 0xc2, 0xd5, 0x55, 0xf6, 0x2a,
+	0x7b, 0x73, 0x96, 0x79, 0x57, 0x10, 0x60, 0xfc, 0xe2, 0x28, 0x7d, 0x9d, 0x1c, 0x7b, 0x96, 0x22,
+	0x8a, 0xd5, 0x62, 0x91, 0x14, 0x85, 0x67, 0xab, 0x22, 0x5f, 0x65, 0x59, 0x9a, 0x9d, 0x78, 0x8e,
+	0x2a, 0xce, 0x8e, 0xd2, 0x53, 0x55, 0xec, 0xc5, 0xdf, 0x2d, 0xb8, 0xb6, 0xd8, 0x78, 0x39, 0xb8,
+	0x84, 0x83, 0x4b, 0x39, 0xe3, 0x9d, 0x5d, 0xf9, 0xeb, 0x2c, 0x66, 0x77, 0xff, 0xff, 0x7b, 0xf0,
+	0x18, 0xdc, 0x0d, 0xbb, 0x78, 0x6b, 0x5b, 0x04, 0xc3, 0xa4, 0xd9, 0xee, 0x74, 0xde, 0x8f, 0x35,
+	0xf5, 0xf8, 0x57, 0x00, 0x00, 0x00, 0xff, 0xff, 0x62, 0x6e, 0xc2, 0x4a, 0xf5, 0x02, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -124,7 +333,8 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type CursorPluginClient interface {
-	ExecuteJob(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TestResponse, error)
+	GetPipelineInfo(ctx context.Context, in *GetPipelineInfoRequest, opts ...grpc.CallOption) (*GetPipelineInfoResponse, error)
+	ExecuteTask(ctx context.Context, in *ExecuteTaskRequest, opts ...grpc.CallOption) (*ExecuteTaskResponse, error)
 }
 
 type cursorPluginClient struct {
@@ -135,9 +345,18 @@ func NewCursorPluginClient(cc *grpc.ClientConn) CursorPluginClient {
 	return &cursorPluginClient{cc}
 }
 
-func (c *cursorPluginClient) ExecuteJob(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TestResponse, error) {
-	out := new(TestResponse)
-	err := c.cc.Invoke(ctx, "/proto.CursorPlugin/ExecuteJob", in, out, opts...)
+func (c *cursorPluginClient) GetPipelineInfo(ctx context.Context, in *GetPipelineInfoRequest, opts ...grpc.CallOption) (*GetPipelineInfoResponse, error) {
+	out := new(GetPipelineInfoResponse)
+	err := c.cc.Invoke(ctx, "/proto.CursorPlugin/GetPipelineInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cursorPluginClient) ExecuteTask(ctx context.Context, in *ExecuteTaskRequest, opts ...grpc.CallOption) (*ExecuteTaskResponse, error) {
+	out := new(ExecuteTaskResponse)
+	err := c.cc.Invoke(ctx, "/proto.CursorPlugin/ExecuteTask", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -146,27 +365,57 @@ func (c *cursorPluginClient) ExecuteJob(ctx context.Context, in *Empty, opts ...
 
 // CursorPluginServer is the server API for CursorPlugin service.
 type CursorPluginServer interface {
-	ExecuteJob(context.Context, *Empty) (*TestResponse, error)
+	GetPipelineInfo(context.Context, *GetPipelineInfoRequest) (*GetPipelineInfoResponse, error)
+	ExecuteTask(context.Context, *ExecuteTaskRequest) (*ExecuteTaskResponse, error)
+}
+
+// UnimplementedCursorPluginServer can be embedded to have forward compatible implementations.
+type UnimplementedCursorPluginServer struct {
+}
+
+func (*UnimplementedCursorPluginServer) GetPipelineInfo(ctx context.Context, req *GetPipelineInfoRequest) (*GetPipelineInfoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPipelineInfo not implemented")
+}
+func (*UnimplementedCursorPluginServer) ExecuteTask(ctx context.Context, req *ExecuteTaskRequest) (*ExecuteTaskResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ExecuteTask not implemented")
 }
 
 func RegisterCursorPluginServer(s *grpc.Server, srv CursorPluginServer) {
 	s.RegisterService(&_CursorPlugin_serviceDesc, srv)
 }
 
-func _CursorPlugin_ExecuteJob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+func _CursorPlugin_GetPipelineInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPipelineInfoRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CursorPluginServer).ExecuteJob(ctx, in)
+		return srv.(CursorPluginServer).GetPipelineInfo(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.CursorPlugin/ExecuteJob",
+		FullMethod: "/proto.CursorPlugin/GetPipelineInfo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CursorPluginServer).ExecuteJob(ctx, req.(*Empty))
+		return srv.(CursorPluginServer).GetPipelineInfo(ctx, req.(*GetPipelineInfoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CursorPlugin_ExecuteTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExecuteTaskRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CursorPluginServer).ExecuteTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.CursorPlugin/ExecuteTask",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CursorPluginServer).ExecuteTask(ctx, req.(*ExecuteTaskRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -176,8 +425,12 @@ var _CursorPlugin_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*CursorPluginServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "ExecuteJob",
-			Handler:    _CursorPlugin_ExecuteJob_Handler,
+			MethodName: "GetPipelineInfo",
+			Handler:    _CursorPlugin_GetPipelineInfo_Handler,
+		},
+		{
+			MethodName: "ExecuteTask",
+			Handler:    _CursorPlugin_ExecuteTask_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
