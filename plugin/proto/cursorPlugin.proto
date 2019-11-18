@@ -1,37 +1,39 @@
 syntax = "proto3";
 package proto;
 
-// Task is the smallest unit of work. A task accomplishes some hyper specific thing.
+// Task is the smallest unit of work. A task accomplishes some hyper specific
+// thing.
 // Many tasks together make up a single pipeline
 message TaskInfo {
-    string name = 2;
-    string description = 3;
-    repeated string children = 4;
+  string name = 2;
+  string description = 3;
+  repeated string children = 4;
 }
 
 service CursorPlugin {
-    rpc GetPipelineInfo(GetPipelineInfoRequest) returns (GetPipelineInfoResponse);
-    rpc ExecuteTask(ExecuteTaskRequest) returns (ExecuteTaskResponse);
+  rpc GetPipelineInfo(GetPipelineInfoRequest) returns (GetPipelineInfoResponse);
+  rpc ExecuteTask(ExecuteTaskRequest) returns (ExecuteTaskResponse);
 }
 
-message GetPipelineInfoRequest{}
-message GetPipelineInfoResponse{
-    string root_task = 1;
-    map<string, TaskInfo> tasks = 2;
+message GetPipelineInfoRequest {
+}
+message GetPipelineInfoResponse {
+  string root_task = 1;
+  map<string, TaskInfo> tasks = 2;
 }
 
 message ExecuteTaskRequest {
-    string id = 1;
+  string id = 1;
 }
 
 message ExecuteTaskResponse {
-    enum Status {
-        UNKNOWN = 0;
-        FAILED = 1;
-        SUCCESS = 2;
-        RUNNING = 3;
-        WAITING = 4;
-    }
-    Status status = 1;
-    repeated string children = 2;
+  enum Status {
+    UNKNOWN = 0;
+    FAILED = 1;
+    SUCCESS = 2;
+    RUNNING = 3;
+    WAITING = 4;
+  }
+  Status status = 1;
+  repeated string children = 2;
 }
