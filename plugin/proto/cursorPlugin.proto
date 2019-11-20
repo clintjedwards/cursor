@@ -35,5 +35,4 @@ message ExecuteTaskResponse {
     WAITING = 4;
   }
   Status status = 1;
-  repeated string children = 2;
 }
