@@ -25,11 +25,6 @@ type MasterConfig struct {
 	PluginDirectoryPath string `envconfig:"cursor_plugin_directory_path" default:"/tmp/cursortest/plugins"`
 }
 
-// MinionConfig defines config settings for the cursor minions
-type MinionConfig struct {
-	URL string `envconfig:"cursor_minion_url" default:"localhost:8082"`
-}
-
 // FrontendConfig represents configuration for frontend basecoat
 type FrontendConfig struct {
 	Enable bool `envconfig:"frontend_enable" default:"true"`
@@ -51,7 +46,7 @@ type Config struct {
 	TLSKeyPath  string `envconfig:"tls_key_path" default:"./localhost.key"`
 	Database    *DatabaseConfig
 	Master      *MasterConfig
-	Minion      *MinionConfig
+	CommandLine *CommandLineConfig
 }
 
 // FromEnv parses environment variables into the config object based on envconfig name

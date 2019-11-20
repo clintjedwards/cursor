@@ -82,18 +82,11 @@ service CursorMaster {
   rpc GetPipelineRun(GetPipelineRunRequest) returns (GetPipelineRunResponse);
 }
 
-message GetPipelineRequest {
-  string id = 1;
-}
-message GetPipelineResponse {
-  Pipeline pipeline = 1;
-}
+message GetPipelineRequest { string id = 1; }
+message GetPipelineResponse { Pipeline pipeline = 1; }
 
-message ListPipelinesRequest {
-}
-message ListPipelinesResponse {
-  map<string, Pipeline> pipelines = 1;
-}
+message ListPipelinesRequest {}
+message ListPipelinesResponse { map<string, Pipeline> pipelines = 1; }
 
 message CreatePipelineRequest {
   // name is a human readable pipeline name
@@ -107,9 +100,7 @@ message CreatePipelineRequest {
   string repository_url = 3;
 }
 
-message CreatePipelineResponse {
-  string id = 1;
-}
+message CreatePipelineResponse { string id = 1; }
 
 message RunPipelineRequest {
   string id = 1;
@@ -122,16 +113,10 @@ message RunPipelineRequest {
   // the task given (or the default pipeline task)
   bool run_single_task = 3;
 }
+message RunPipelineResponse {}
 
-message RunPipelineResponse {
-}
-
-message DeletePipelineRequest {
-  string id = 1;
-}
-
-message DeletePipelineResponse {
-}
+message DeletePipelineRequest { string id = 1; }
+message DeletePipelineResponse {}
 
 message GetPipelineRunRequest {
   // pipeline_id refers to the id of a particular pipeline
@@ -140,6 +125,4 @@ message GetPipelineRunRequest {
   string id = 2;
 }
 
-message GetPipelineRunResponse {
-  PipelineRun pipeline_run = 1;
-}
+message GetPipelineRunResponse { PipelineRun pipeline_run = 1; }

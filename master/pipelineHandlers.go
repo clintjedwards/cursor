@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/clintjedwards/cursor/api"
-	"github.com/clintjedwards/cursor/plugin"
 	"github.com/clintjedwards/cursor/utils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -36,6 +35,8 @@ func (master *CursorMaster) CreatePipeline(context context.Context, request *api
 	if err != nil {
 		return &api.CreatePipelineResponse{}, status.Error(codes.Internal, fmt.Sprintf("could not build plugin: %s", err))
 	}
+
+	master.addPlugin(pipelineID)
 
 	pipelineInfo, err := master.getPipelineInfo(pipelineID)
 	if err != nil {
@@ -67,10 +68,6 @@ func (master *CursorMaster) CreatePipeline(context context.Context, request *api
 	if err != nil {
 		return &api.CreatePipelineResponse{}, status.Error(codes.Internal, "could not save pipeline when attempting to create new pipeline")
 	}
-
-	master.pluginMapMutex.Lock()
-	defer master.pluginMapMutex.Unlock()
-	master.pluginMap[newPipeline.Id] = &plugin.CursorPlugin{}
 
 	utils.StructuredLog(utils.LogLevelInfo, "pipeline created", newPipeline)
 
@@ -150,9 +147,7 @@ func (master *CursorMaster) DeletePipeline(context context.Context, request *api
 		return &api.DeletePipelineResponse{}, status.Error(codes.Internal, "could not delete pipeline")
 	}
 
-	master.pluginMapMutex.Lock()
-	defer master.pluginMapMutex.Unlock()
-	delete(master.pluginMap, request.Id)
+	master.deletePlugin(request.Id)
 
 	utils.StructuredLog(utils.LogLevelInfo, "formula deleted", request.Id)
 

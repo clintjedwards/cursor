@@ -14,3 +14,4 @@
 - Tasks should eventually properly show us logs
 - Investigate using value passes instead of reference passes for ExecuteTask and friends
 - Save plugins as they are added and reload them from the database on application startup
+- CLI should use cool spinners because shutup

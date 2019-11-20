@@ -141,3 +141,15 @@ func (master *CursorMaster) runTasks(pipelineID, taskID string) error {
 
 	return nil
 }
+
+func (master *CursorMaster) addPlugin(id string) {
+	master.pluginMapMutex.Lock()
+	defer master.pluginMapMutex.Unlock()
+	master.pluginMap[id] = &cursorPlugin.CursorPlugin{}
+}
+
+func (master *CursorMaster) deletePlugin(id string) {
+	master.pluginMapMutex.Lock()
+	defer master.pluginMapMutex.Unlock()
+	delete(master.pluginMap, id)
+}
