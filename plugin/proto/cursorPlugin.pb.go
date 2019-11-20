@@ -8,8 +8,6 @@ import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -375,17 +373,6 @@ type CursorPluginServer interface {
 	// pipeline and a default task used as the root task
 	GetPipelineInfo(context.Context, *GetPipelineInfoRequest) (*GetPipelineInfoResponse, error)
 	ExecuteTask(context.Context, *ExecuteTaskRequest) (*ExecuteTaskResponse, error)
-}
-
-// UnimplementedCursorPluginServer can be embedded to have forward compatible implementations.
-type UnimplementedCursorPluginServer struct {
-}
-
-func (*UnimplementedCursorPluginServer) GetPipelineInfo(ctx context.Context, req *GetPipelineInfoRequest) (*GetPipelineInfoResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetPipelineInfo not implemented")
-}
-func (*UnimplementedCursorPluginServer) ExecuteTask(ctx context.Context, req *ExecuteTaskRequest) (*ExecuteTaskResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ExecuteTask not implemented")
 }
 
 func RegisterCursorPluginServer(s *grpc.Server, srv CursorPluginServer) {

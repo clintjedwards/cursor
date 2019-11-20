@@ -51,17 +51,25 @@ func (master *CursorMaster) CreatePipeline(context context.Context, request *api
 		Modified:      time.Now().Unix(),
 		LastCompiled:  time.Now().Unix(),
 		RootTaskId:    pipelineInfo.RootTask,
-		Tasks:         pipelineInfo.Tasks,
+		Tasks:         map[string]*api.Task{},
 	}
 
-	taskMap :=
-	//newPipeline
+	// Convert plugin taskInfo proto to api task proto
+	for taskID, task := range pipelineInfo.Tasks {
+		newPipeline.Tasks[taskID] = &api.Task{
+			Name:        task.Name,
+			Description: task.Description,
+			Children:    task.Children,
+		}
+	}
 
 	err = master.storage.AddPipeline(newPipeline.Id, &newPipeline)
 	if err != nil {
 		return &api.CreatePipelineResponse{}, status.Error(codes.Internal, "could not save pipeline when attempting to create new pipeline")
 	}
 
+	master.pluginMapMutex.Lock()
+	defer master.pluginMapMutex.Unlock()
 	master.pluginMap[newPipeline.Id] = &plugin.CursorPlugin{}
 
 	utils.StructuredLog(utils.LogLevelInfo, "pipeline created", newPipeline)
@@ -89,7 +97,7 @@ func (master *CursorMaster) GetPipeline(context context.Context, request *api.Ge
 
 	pipeline, err := master.storage.GetPipeline(request.Id)
 	if err != nil {
-		if err == utils.ErrPipelineNotFound {
+		if err == utils.ErrEntityNotFound {
 			return &api.GetPipelineResponse{}, status.Error(codes.NotFound, "requested pipeline not found")
 		}
 		return &api.GetPipelineResponse{}, status.Error(codes.Internal, "failed to retrieve formula from database")
@@ -106,7 +114,15 @@ func (master *CursorMaster) RunPipeline(context context.Context, request *api.Ru
 
 	taskID := request.TaskId
 	if taskID == "" {
-		// TODO: Get pipeline here and figure out what the root task is
+		pipeline, err := master.storage.GetPipeline(request.Id)
+		if err != nil {
+			if err == utils.ErrEntityNotFound {
+				return &api.RunPipelineResponse{}, status.Error(codes.NotFound, "requested pipeline not found")
+			}
+			return &api.RunPipelineResponse{}, status.Error(codes.Internal, "failed to retrieve formula from database")
+		}
+
+		taskID = pipeline.RootTaskId
 	}
 
 	err := master.runTasks(request.Id, taskID)
@@ -127,12 +143,16 @@ func (master *CursorMaster) DeletePipeline(context context.Context, request *api
 
 	err := master.storage.DeletePipeline(request.Id)
 	if err != nil {
-		if err == utils.ErrPipelineNotFound {
+		if err == utils.ErrEntityNotFound {
 			return &api.DeletePipelineResponse{}, status.Error(codes.NotFound, "could not delete pipeline; key not found")
 		}
 		utils.StructuredLog(utils.LogLevelError, "could not delete pipeline", err)
 		return &api.DeletePipelineResponse{}, status.Error(codes.Internal, "could not delete pipeline")
 	}
+
+	master.pluginMapMutex.Lock()
+	defer master.pluginMapMutex.Unlock()
+	delete(master.pluginMap, request.Id)
 
 	utils.StructuredLog(utils.LogLevelInfo, "formula deleted", request.Id)
 

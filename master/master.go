@@ -8,6 +8,7 @@ import (
 
 	"github.com/clintjedwards/cursor/api"
 	"github.com/clintjedwards/cursor/config"
+	cursorPlugin "github.com/clintjedwards/cursor/plugin"
 	"github.com/clintjedwards/cursor/storage"
 	"github.com/clintjedwards/cursor/utils"
 	"github.com/hashicorp/go-plugin"
@@ -18,10 +19,10 @@ import (
 
 // CursorMaster represents a cursor master server
 type CursorMaster struct {
-	storage       storage.Engine
-	config        *config.Config
-	pluginMap     map[string]plugin.Plugin
-	pluginMapLock sync.Mutex
+	storage        storage.Engine
+	config         *config.Config
+	pluginMap      map[string]plugin.Plugin
+	pluginMapMutex sync.Mutex
 }
 
 // NewCursorMaster inits a grpc cursor master server
@@ -38,6 +39,16 @@ func NewCursorMaster(config *config.Config) *CursorMaster {
 	cursorMaster.config = config
 	cursorMaster.storage = storage
 	cursorMaster.pluginMap = map[string]plugin.Plugin{}
+
+	pipelines, err := storage.GetAllPipelines()
+	if err != nil {
+		utils.StructuredLog(utils.LogLevelError, "could not retrieve pipelines from database while attempting to get all", err)
+		panic(err)
+	}
+
+	for pipelineID := range pipelines {
+		cursorMaster.pluginMap[pipelineID] = &cursorPlugin.CursorPlugin{}
+	}
 
 	return &cursorMaster
 }

@@ -91,7 +91,7 @@ func (boltDB *boltDB) GetPipeline(id string) (*api.Pipeline, error) {
 
 		pipelineRaw := bucket.Get([]byte(id))
 		if pipelineRaw == nil {
-			return utils.ErrPipelineNotFound
+			return utils.ErrEntityNotFound
 		}
 
 		err := proto.Unmarshal(pipelineRaw, &storedPipeline)
@@ -115,7 +115,7 @@ func (boltDB *boltDB) AddPipeline(id string, pipeline *api.Pipeline) error {
 		// First check if key exists
 		currentPipeline := bucket.Get([]byte(id))
 		if currentPipeline != nil {
-			return utils.ErrPipelineExists
+			return utils.ErrEntityExists
 		}
 
 		pipelineRaw, err := proto.Marshal(pipeline)
@@ -142,7 +142,7 @@ func (boltDB *boltDB) UpdatePipeline(id string, pipeline *api.Pipeline) error {
 		// First check if key exists
 		currentPipeline := bucket.Get([]byte(id))
 		if currentPipeline == nil {
-			return utils.ErrPipelineNotFound
+			return utils.ErrEntityNotFound
 		}
 
 		pipelineRaw, err := proto.Marshal(pipeline)
@@ -169,7 +169,7 @@ func (boltDB *boltDB) DeletePipeline(id string) error {
 		// First check if key exists
 		currentPipeline := bucket.Get([]byte(id))
 		if currentPipeline == nil {
-			return utils.ErrPipelineNotFound
+			return utils.ErrEntityNotFound
 		}
 
 		err := bucket.Delete([]byte(id))
