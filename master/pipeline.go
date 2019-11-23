@@ -100,8 +100,9 @@ func (master *CursorMaster) getPipelineInfo(pipelineID string) (proto.GetPipelin
 	return *response, nil
 }
 
-// runTasks checks the plugins loaded for the specific task to run
-func (master *CursorMaster) runTasks(pipelineID, taskID string) error {
+// initPipelineRun loads the correct plugin from the plugin map and starts
+// the process required to run tasks
+func (master *CursorMaster) initPipelineRun(pipelineID, taskID string, runSingleTask bool) error {
 
 	pluginPath := fmt.Sprintf("%s/%s", master.config.Master.PluginDirectoryPath, pipelineID)
 
@@ -126,6 +127,11 @@ func (master *CursorMaster) runTasks(pipelineID, taskID string) error {
 		return err
 	}
 
+	// Before we start calling tasks we need to make a new entry in the database
+	// to track this pipeline run
+	// should a pipeline run be made up of many task runs?
+	// should we store pipeline runs inside pipelines and therefore store task runs inside pipeline runs?
+
 	pipeline := raw.(cursorPlugin.PipelineDefinition)
 	message, err := pipeline.ExecuteTask(&proto.ExecuteTaskRequest{
 		Id: taskID,
@@ -140,6 +146,13 @@ func (master *CursorMaster) runTasks(pipelineID, taskID string) error {
 	fmt.Println(message)
 
 	return nil
+}
+
+// executeTaskGraph spawns the required goroutinues necessary to run the graph of tasks
+// for a pipeline
+func (master *CursorMaster) executeTaskGraph(pipeline cursorPlugin.PipelineDefinition,
+	rootTaskID string, runSingleTask bool) {
+
 }
 
 func (master *CursorMaster) addPlugin(id string) {

@@ -122,7 +122,7 @@ func (master *CursorMaster) RunPipeline(context context.Context, request *api.Ru
 		taskID = pipeline.RootTaskId
 	}
 
-	err := master.runTasks(request.Id, taskID)
+	err := master.initPipelineRun(request.Id, taskID, request.RunSingleTask)
 	if err != nil {
 		return &api.RunPipelineResponse{}, status.Error(codes.Internal, "failed to run pipeline")
 	}

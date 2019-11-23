@@ -54,7 +54,7 @@ func init() {
 }
 
 // populateTree is a recursive function that parses a graph map and turns it into
-// tree graph
+// tree graph. taskTree is a pointer to a tree datastructure.
 func populateTree(nodeID string, taskMap map[string]*api.Task, taskTree treeprint.Tree) {
 	if _, ok := taskMap[nodeID]; !ok {
 		return
