@@ -15,3 +15,4 @@
 - Investigate using value passes instead of reference passes for ExecuteTask and friends
 - Save plugins as they are added and reload them from the database on application startup
 - CLI should use cool spinners because shutup
+- ExecuteTask requests should have a parent status and run ID passed to them so that sdk users can use these vars to do interesting things. This means we need to implement the functionality of embedded arguments to the functions? Can we expose these another way?
